@@ -3,6 +3,7 @@ Imports System.Web.Services
 Imports System.Web.Services.Protocols
 Imports System.ComponentModel
 
+
 Public Class PSCmdParam
     Private dlog As NLog.Logger = NLog.LogManager.GetCurrentClassLogger()
 
@@ -129,6 +130,7 @@ Public Class PSCmdParam
     End Sub
 
     Public Function Clone() As PSCmdParam
+
         Dim psparam As New PSCmdParam
         psparam.Name = Name
         psparam.HelpMessage = HelpMessage
@@ -136,14 +138,75 @@ Public Class PSCmdParam
         psparam.VarType = VarType
         psparam.DirectiveDateTime = DirectiveDateTime
         psparam.DirectiveMultiline = DirectiveMultiline
-        psparam.DefaultValue = DefaultValue
-        For Each val As String In Validation
-            psparam.AddValidation(val)
-        Next
+
+        'Sobald in der validate.ps1 eine Variable mit FPIT am Anfang gefunden wird dann spring er aus seinem ursprünglichen Script
+
+        If psparam.Name.Substring(0, 4) = "FPIT" Then
+
+            If DefaultValue = "" Then
+                DefaultValue = "0"
+            End If
+
+            'Aufruf externes Powershell Script
+            'script.ps1 <VariablenName> <Wert>  C:\temp\WebJEA\WebJea-Scripts\test.ps1
+            Dim FPIT_Path = WebJEA.My.Settings.configfile
+            FPIT_Path = FPIT_Path.Replace("config.json", "FPIT_Commands.ps1")
+            Dim pscommand As String = FPIT_Path & " " & psparam.Name & " " & DefaultValue & "; exit $LASTEXITCODE"
+            Dim cmd As String = "powershell.exe -noprofile -NonInteractive -WindowStyle hidden -command " & pscommand
+            Dim shell = CreateObject("WScript.Shell")
+            Dim executor = shell.Exec(cmd)
+            executor.StdIn.Close
+            Dim Ausgabe As String = executor.StdOut.ReadAll
+
+
+
+            If psparam.Name.Substring(4, 2) = "SL" Then
+
+                'SingleLine (Textbox), einfache Ausgabe
+                psparam.DefaultValue = Ausgabe
+
+            ElseIf psparam.Name.Substring(4, 2) = "ML" Then
+
+                'Multiline
+                psparam.DefaultValue = Ausgabe
+
+            ElseIf psparam.Name.Substring(4, 2) = "LB" Then
+
+                Dim arr = Split(Ausgabe, ";")
+                ReDim Preserve arr(UBound(arr) - 1)
+
+                Dim tmpValidation As String = "VALIDATESET("
+                Dim MyInList As New System.Collections.Generic.List(Of String)
+
+                For Each Eintrag As String In arr
+                    MyInList.Add(Eintrag)
+                    tmpValidation = tmpValidation + "'" + Eintrag + "',"
+                Next
+
+                tmpValidation = Left(tmpValidation, (tmpValidation.Length - 1))
+                tmpValidation = tmpValidation + ")"
+
+                psparam.AddValidation(tmpValidation)
+
+            Else
+
+            End If
+            '###########
+
+        Else 'Rest der alten Funktion
+            psparam.DefaultValue = DefaultValue
+
+            For Each val As String In Validation
+                psparam.AddValidation(val)
+            Next
+        End If
+
+
 
         Return psparam
 
     End Function
+
 
     Public Sub MergeUnder(psparam As PSCmdParam)
         'this will merge "under" the current parameter.
