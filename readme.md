@@ -1,4 +1,6 @@
-# WebJEA: PowerShell driven Web Forms for Secure Self-Service
+## This is a custom version of WebJEA which is currently W.I.P. Please do not use in production if you don't know what you are doing.
+
+WebJEA: PowerShell driven Web Forms for Secure Self-Service
 
 WebJEA allows you to dynamically build web forms for any PowerShell script.  WebJEA automatically parses the script at page load for description, parameters and validation, then dynamically builds a form to take input and display formatted output.  You define access groups via AD and the scripts run within the AppPool user context.
 
