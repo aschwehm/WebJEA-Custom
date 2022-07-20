@@ -16,6 +16,7 @@ Public Class PSCmdParam
     End Enum
 
     Public Name As String
+    Public VisibleName As String
     Public HelpMessage As String = ""
     Public HelpDetail As String = ""
     Public DirectiveMultiline As Boolean = False
@@ -132,7 +133,18 @@ Public Class PSCmdParam
     Public Function Clone() As PSCmdParam
 
         Dim psparam As New PSCmdParam
-        psparam.Name = Name
+        If Name.Contains(";") Then
+            psparam.Name = Name.Substring(0, Name.IndexOf(";"))
+            psparam.VisibleName = Name.Substring(Name.IndexOf(";") + 1)
+
+            If psparam.VisibleName.Contains("_") Then
+                psparam.VisibleName = psparam.VisibleName.Replace("_", " ")
+            End If
+
+        Else
+            psparam.Name = Name
+        End If
+
         psparam.HelpMessage = HelpMessage
         psparam.HelpDetail = HelpDetail
         psparam.VarType = VarType
@@ -201,7 +213,9 @@ Public Class PSCmdParam
             Next
         End If
 
-
+        If Not psparam.VisibleName = "" Then
+            psparam.Name = psparam.VisibleName
+        End If
 
         Return psparam
 
