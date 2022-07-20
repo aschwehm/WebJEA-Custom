@@ -1,4 +1,6 @@
-# WebJEA: PowerShell driven Web Forms for Secure Self-Service
+## This is a custom version of WebJEA which is currently W.I.P. Please do not use in production if you don't know what you are doing.
+
+WebJEA: PowerShell driven Web Forms for Secure Self-Service
 
 WebJEA allows you to dynamically build web forms for any PowerShell script.  WebJEA automatically parses the script at page load for description, parameters and validation, then dynamically builds a form to take input and display formatted output.  You define access groups via AD and the scripts run within the AppPool user context.
 
@@ -8,6 +10,18 @@ _WebJEA does not require JEA endpoints but can work with them.  With WebJEA, any
 
 Prefill Fields/Listboxes of the validate script on PageLoad (Fill Listbox with Users...)
 
+* $FPITLBXXX
+  * Creates a Listbox that can be Pre-Filled
+* $FPITSLXXX
+  * Creates a single line Textbox that can be re-Filled
+
+
+Change the Display Name of a Field
+
+* Variable Name;Visible Name
+  * [string[]]$FPITLB003;Name_vom_Feld
+    * Underscore character gets replaced with a space
+    * The .PARAMETER Variable in this case needs to be like this $FPITLB003;Name_vom_Feld
 
 ## Goals
 
