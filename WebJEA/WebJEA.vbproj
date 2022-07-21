@@ -420,6 +420,7 @@
     <Compile Include="PSEngine.vb" />
     <Compile Include="PSScriptParser.vb" />
     <Compile Include="PSWebHelper.vb" />
+    <Compile Include="Settings.vb" />
     <Compile Include="Telemetry.vb" />
     <Compile Include="UserInfo.vb" />
   </ItemGroup>

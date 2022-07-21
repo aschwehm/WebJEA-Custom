@@ -12,6 +12,7 @@ Public Class PSScriptParser
     Private prvDescription As String
     Private prvExamples As New List(Of String)
     Private prvParameterHelp As New Dictionary(Of String, String)
+    Private prvParameterVisibleName As New Dictionary(Of String, String)
     Private prvPSParam As New List(Of PSCmdParam)
     Private prvIsValid As Boolean = False
 
@@ -27,6 +28,7 @@ Public Class PSScriptParser
         prvDescription = ""
         prvExamples = New List(Of String)
         prvParameterHelp = New Dictionary(Of String, String)
+        prvParameterVisibleName = New Dictionary(Of String, String)
         prvPSParam = New List(Of PSCmdParam)
         prvIsValid = False
 
@@ -169,6 +171,10 @@ Public Class PSScriptParser
                 Dim paramname As String = header.ToUpper.Replace("PARAMETER", "").Trim
                 dlog.Trace("ScriptParser: CommentBlockSection: Adding Description for PARAMETER: " & paramname)
                 prvParameterHelp.Add(paramname, comment)
+            ElseIf (header.ToUpper.StartsWith("VISIBLENAME")) Then
+                Dim paramname As String = header.ToUpper.Replace("VISIBLENAME", "").Trim
+                dlog.Trace("ScriptParser: CommentBlockSection: Adding Description for VISIBLENAME: " & paramname)
+                prvParameterVisibleName.Add(paramname, comment)
             Else
                 dlog.Error("ScriptParser: Could not parse commentblock: " & header)
             End If
@@ -240,6 +246,9 @@ Public Class PSScriptParser
                     'check if there's a helpdetail, if so, add it now
                     If prvParameterHelp.ContainsKey(valstring.ToUpper) Then
                         psparam.HelpDetail = prvParameterHelp(valstring.ToUpper)
+                    End If
+                    If prvParameterVisibleName.ContainsKey(valstring.ToUpper) Then
+                        psparam.VisibleName = prvParameterVisibleName(valstring.ToUpper)
                     End If
                     IDX = closeIDX - 1 'subtract one because we didn't use the matched character and we want to evaluate it on the next step
                 Case "=" 'default value

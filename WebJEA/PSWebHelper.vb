@@ -163,7 +163,8 @@
         Dim objRow As HtmlGenericControl = NewControl("div", "form-group")
 
         'generate string inputs
-        Dim objLabel As Label = NewControlLabel(param.Name)
+        Dim objLabel As Label = NewControlLabel(param.VisibleName)
+
 
 
         Dim objControl As New TextBox
@@ -214,7 +215,7 @@
         Dim objRow As HtmlGenericControl = NewControl("div", "form-group")
 
         'generate string inputs
-        Dim objLabel As Label = NewControlLabel(param.Name)
+        Dim objLabel As Label = NewControlLabel(param.VisibleName)
 
         Dim strReqOpt As String = "Required"
         Dim objReqOpt As HtmlControl = NewControl("span", "reqopt", strReqOpt)
@@ -262,7 +263,7 @@
         Dim objRow As HtmlGenericControl = NewControl("div", "form-group")
 
         'generate string inputs
-        Dim objLabel As Label = NewControlLabel(param.Name)
+        Dim objLabel As Label = NewControlLabel(param.VisibleName)
 
 
 
@@ -316,7 +317,7 @@
         Dim objRow As HtmlGenericControl = NewControl("div", "form-group")
 
         'generate string inputs
-        Dim objLabel As Label = NewControlLabel(param.Name)
+        Dim objLabel As Label = NewControlLabel(param.VisibleName)
 
         Dim strReqOpt As String = "Required"
         Dim objReqOpt As HtmlControl = NewControl("span", "reqopt", strReqOpt)
@@ -388,7 +389,7 @@
         Dim objRow As HtmlGenericControl = NewControl("div", "form-group")
 
         'generate string inputs
-        Dim objLabel As Label = NewControlLabel(param.Name)
+        Dim objLabel As Label = NewControlLabel(param.VisibleName)
 
         Dim strReqOpt As String = "Required"
         Dim objReqOpt As HtmlControl = NewControl("span", "reqopt", strReqOpt)
