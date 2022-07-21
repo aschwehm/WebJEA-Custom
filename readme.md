@@ -16,12 +16,9 @@ Prefill Fields/Listboxes of the validate script on PageLoad (Fill Listbox with U
   * Creates a single line Textbox that can be re-Filled
 
 
-Change the Display Name of a Field
 
-* Variable Name;Visible Name
-  * [string[]]$FPITLB003;Name_vom_Feld
-    * Underscore character gets replaced with a space
-    * The .PARAMETER Variable in this case needs to be like this $FPITLB003;Name_vom_Feld
+* Change the Display Name of a Field
+
 
 ## Goals
 
