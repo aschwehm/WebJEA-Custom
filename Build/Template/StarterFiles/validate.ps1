@@ -15,6 +15,9 @@ Short description of the parameter and how to use it.  Include PARAMETER for eac
 .PARAMETER Input02MandatoryMinLen
 Short description of the parameter and how to use it.
 
+.VISIBLENAME Input01Mandatory
+New Name of the Lable
+
 .INPUTS
 String
 #.NET Framework object types that can be _piped_ in.  Repeat allowed inputs within single INPUTS
