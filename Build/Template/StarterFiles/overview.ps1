@@ -4,10 +4,10 @@ $DebugPreference = "Continue"
 write-host "You can also specify a script to run each time the page loads."
 
 write-host "WebJEA supports some basic formatting like:
-Links: [[a |url|display]] -[[a|?cmdid=sample1|go to sample1]]-
-CSS tags in a span: [[span |cssclasses|content]] -[[span|psvariable|this span uses a variable width font and italicised]]-.
-Img: [[img |cssclasses|url]] [[img||./content/ps.png]]
-Nesting: [[a |url|[[img |cssclasses|url]]]] [[a|//powershell.org|[[img||./content/ps.png]]]]"
+Links: [[a|url|display]] -[[a|?cmdid=sample1|go to sample1]]-
+CSS tags in a span: [[span|cssclasses|content]] -[[span|psvariable|this span uses a variable width font and italicised]]-.
+Img: [[img|cssclasses|url]] [[img||./content/ps.png]]
+Nesting: [[a|url|[[img |cssclasses|url]]]] [[a|//powershell.org|[[img||./content/ps.png]]]]"
 
 Write-Host "We html encode script output for safety, <a href='see?'></a>"
 
