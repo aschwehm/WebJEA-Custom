@@ -259,6 +259,9 @@ Public Class PSScriptParser
                     If prvParameterFormGroup.ContainsKey(valstring.ToUpper) Then
                         psparam.FormGroup = prvParameterFormGroup(valstring.ToUpper)
                         psparam.PostBackVisibleName = psparam.FormGroup
+                        If prvParameterFormGroup.ContainsKey(psparam.FormGroup) Then
+                            psparam.BackLinkFormGroup = prvParameterFormGroup.Item(psparam.FormGroup)
+                        End If
                     End If
                     'Set AutoPostBack for WebControlField
                     If prvParameterFormGroup.ContainsValue(valstring.ToUpper) Then

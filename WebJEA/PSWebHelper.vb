@@ -423,7 +423,7 @@
             If param.FormGroup IsNot "" Then
                 'objLI.Text = ""
                 'objLI.Value = ""
-                If Not WebJEA._default.CachedFormValues.ContainsKey("psparam_" + param.FormGroup) Then
+                If Not WebJEA._default.CachedFormValues.ContainsKey("psparam_" + param.FormGroup) Or (Not WebJEA._default.CachedFormValues.ContainsKey("psparam_" + param.BackLinkFormGroup) And Not param.BackLinkFormGroup = "") Then
                     'DefaultValue = WebJEA._default.CachedFormValues.Item("psparam_" + FormGroup)
                     'psparam.FormGroup = FormGroup
                     objLI.Text = "Bitte zuerst einen Wert aus dem Feld " + param.PostBackVisibleName + " auswählen."

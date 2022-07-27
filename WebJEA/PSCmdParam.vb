@@ -22,6 +22,7 @@ Public Class PSCmdParam
     Public FormGroup As String = ""
     Public HelpDetail As String = ""
     Public AutoPostBack As Boolean = False
+    Public BackLinkFormGroup As String = ""
     Public DirectiveMultiline As Boolean = False
     Public DirectiveDateTime As Boolean = False
     Public VarType As String = ""
@@ -138,11 +139,16 @@ Public Class PSCmdParam
         Dim psparam As New PSCmdParam
         'Dim CachedValue As String
         psparam.Name = Name
+        psparam.BackLinkFormGroup = BackLinkFormGroup
 
         'Set the PostBack Value as Default Value in the Grouped FormField
         If FormGroup IsNot "" Then
             If WebJEA._default.CachedFormValues IsNot Nothing Then
-                DefaultValue = WebJEA._default.CachedFormValues.Item("psparam_" + FormGroup)
+                If WebJEA._default.CachedFormValues.Item("psparam_" + BackLinkFormGroup) Is Nothing And Not BackLinkFormGroup = "" Then
+                    DefaultValue = ""
+                Else
+                    DefaultValue = WebJEA._default.CachedFormValues.Item("psparam_" + FormGroup)
+                End If
                 psparam.FormGroup = FormGroup
             End If
         End If
