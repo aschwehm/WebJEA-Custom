@@ -18,6 +18,9 @@ Short description of the parameter and how to use it.
 .VISIBLENAME Input01Mandatory
 New Name of the Lable
 
+.FORMGROUP FPITLB100
+FPITLB020
+
 .INPUTS
 String
 #.NET Framework object types that can be _piped_ in.  Repeat allowed inputs within single INPUTS
@@ -61,6 +64,12 @@ This template is CC0/1.0 Public Domain and can be found at github.com/markdomans
 #PositionalBinding=$false - default true, allows parameters by position, when false, all parameters must be defined by name (-computername "X")
 
 #note: whatif, confirm, verbose, and debug are all passed through to sub-cmdlets/scripts called within the script.
+
+#FormGroup
+#In this case the Field FPITLB100 is waiting for Data from the Field FPITLB020 and will be linked as a group. If there is no Data then the Value of the Field FPITLB100 will show that it waits on a selection of FPITLB020
+
+#VisibleName
+#The Displayed Name of a Field can be overwritten
 
 param
 (
