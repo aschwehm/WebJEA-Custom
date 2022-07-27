@@ -258,6 +258,7 @@ Public Class PSScriptParser
                     End If
                     If prvParameterFormGroup.ContainsKey(valstring.ToUpper) Then
                         psparam.FormGroup = prvParameterFormGroup(valstring.ToUpper)
+                        psparam.PostBackVisibleName = psparam.FormGroup
                     End If
                     'Set AutoPostBack for WebControlField
                     If prvParameterFormGroup.ContainsValue(valstring.ToUpper) Then
@@ -265,10 +266,12 @@ Public Class PSScriptParser
                     End If
                     'Set VisibleName for Label Info
                     If prvParameterFormGroup.ContainsKey(valstring.ToUpper) Then
-                        psparam.PostBackVisibleName = prvParameterVisibleName.Item(prvParameterFormGroup.Item(valstring.ToUpper))
+                        If prvParameterVisibleName.ContainsKey(prvParameterFormGroup.Item(valstring.ToUpper)) Then
+                            psparam.PostBackVisibleName = prvParameterVisibleName.Item(prvParameterFormGroup.Item(valstring.ToUpper))
+                        End If
                     End If
 
-                    IDX = closeIDX - 1 'subtract one because we didn't use the matched character and we want to evaluate it on the next step
+                        IDX = closeIDX - 1 'subtract one because we didn't use the matched character and we want to evaluate it on the next step
                 Case "=" 'default value
                     Dim closeIDX As Integer = AdvIndexOf(prvScript, New List(Of String)({",", ")", "#"}), IDX)
                     Dim valstring As String = prvScript.Substring(IDX + 1, closeIDX - IDX - 1)
