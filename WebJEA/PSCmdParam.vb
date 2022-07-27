@@ -17,8 +17,11 @@ Public Class PSCmdParam
 
     Public Name As String
     Public VisibleName As String = ""
+    Public PostBackVisibleName As String = ""
     Public HelpMessage As String = ""
+    Public FormGroup As String = ""
     Public HelpDetail As String = ""
+    Public AutoPostBack As Boolean = False
     Public DirectiveMultiline As Boolean = False
     Public DirectiveDateTime As Boolean = False
     Public VarType As String = ""
@@ -133,8 +136,17 @@ Public Class PSCmdParam
     Public Function Clone() As PSCmdParam
 
         Dim psparam As New PSCmdParam
-
+        'Dim CachedValue As String
         psparam.Name = Name
+
+        'Set the PostBack Value as Default Value in the Grouped FormField
+        If FormGroup IsNot "" Then
+            If WebJEA._default.CachedFormValues IsNot Nothing Then
+                DefaultValue = WebJEA._default.CachedFormValues.Item("psparam_" + FormGroup)
+                psparam.FormGroup = FormGroup
+            End If
+        End If
+
 
         If VisibleName = "" Then
             psparam.VisibleName = Name
@@ -148,6 +160,8 @@ Public Class PSCmdParam
         psparam.VarType = VarType
         psparam.DirectiveDateTime = DirectiveDateTime
         psparam.DirectiveMultiline = DirectiveMultiline
+        psparam.AutoPostBack = AutoPostBack
+        psparam.PostBackVisibleName = PostBackVisibleName
 
         'Sobald in der validate.ps1 eine Variable mit FPIT am Anfang gefunden wird dann spring er aus seinem ursprünglichen Script
 
@@ -166,9 +180,19 @@ Public Class PSCmdParam
             Dim shell = CreateObject("WScript.Shell")
             Dim executor = shell.Exec(cmd)
             executor.StdIn.Close
+
             Dim Ausgabe As String = executor.StdOut.ReadAll
 
+            'Filter Special Characters
+            Ausgabe = Ausgabe.Replace("Ã¤", "ä")
+            Ausgabe = Ausgabe.Replace("Ã¼", "ü")
+            Ausgabe = Ausgabe.Replace("Ã¶", "ö")
 
+            Ausgabe = Ausgabe.Replace("Ã„", "Ä")
+            Ausgabe = Ausgabe.Replace("Ãœ", "Ü")
+            Ausgabe = Ausgabe.Replace("Ã–", "Ö")
+
+            Ausgabe = Ausgabe.Replace("ÃŸ", "ß")
 
             If psparam.Name.Substring(4, 2) = "SL" Then
 
@@ -178,33 +202,39 @@ Public Class PSCmdParam
             ElseIf psparam.Name.Substring(4, 2) = "ML" Then
 
                 'Multiline
+                psparam.DirectiveMultiline = True
+
                 psparam.DefaultValue = Ausgabe
 
             ElseIf psparam.Name.Substring(4, 2) = "LB" Then
 
-                Dim arr = Split(Ausgabe, ";")
-                ReDim Preserve arr(UBound(arr) - 1)
+                    Dim arr = Split(Ausgabe, ";")
+                    ReDim Preserve arr(UBound(arr) - 1)
 
-                Dim tmpValidation As String = "VALIDATESET("
-                Dim MyInList As New System.Collections.Generic.List(Of String)
+                    Dim tmpValidation As String = "VALIDATESET("
+                    Dim MyInList As New System.Collections.Generic.List(Of String)
 
-                For Each Eintrag As String In arr
-                    MyInList.Add(Eintrag)
-                    tmpValidation = tmpValidation + "'" + Eintrag + "',"
-                Next
+                    For Each Eintrag As String In arr
+                        MyInList.Add(Eintrag)
+                        tmpValidation = tmpValidation + "'" + Eintrag + "',"
+                    Next
 
-                tmpValidation = Left(tmpValidation, (tmpValidation.Length - 1))
-                tmpValidation = tmpValidation + ")"
+                    tmpValidation = Left(tmpValidation, (tmpValidation.Length - 1))
+                    tmpValidation = tmpValidation + ")"
+
+                If tmpValidation = "VALIDATESET)" Then
+                    tmpValidation = "VALIDATESET('Keine Daten')"
+                End If
 
                 psparam.AddValidation(tmpValidation)
 
-            Else
+                Else
 
-            End If
-            '###########
+                End If
+                '###########
 
-        Else 'Rest der alten Funktion
-            psparam.DefaultValue = DefaultValue
+            Else 'Rest der alten Funktion
+                psparam.DefaultValue = DefaultValue
 
             For Each val As String In Validation
                 psparam.AddValidation(val)

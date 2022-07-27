@@ -394,37 +394,65 @@
         Dim strReqOpt As String = "Required"
         Dim objReqOpt As HtmlControl = NewControl("span", "reqopt", strReqOpt)
 
-
         Dim objControl As New DropDownList
         objControl.ID = param.FieldName
-        objControl.CssClass += " form-control"
+        objControl.CssClass += "form-control"
+
+        'SetAutoPostBack for Object
+        If param.AutoPostBack = True Then
+            objControl.AutoPostBack = True
+        End If
+
         'objControl.Text = ReadGetPost(pg, param.Name, "")
         objLabel.AssociatedControlID = objControl.ID
-
+        'objControl.BorderStyle = BorderStyle.Ridge
         Dim defval As String = Nothing
         If Not String.IsNullOrEmpty(param.DefaultValue) Then
             defval = param.DefaultValue
         End If
         defval = ReadGetPost(pg, param.Name, defval)
 
+        Dim showSelection As Boolean = True
+
         If True Then 'just to scope objli for now
             Dim objLI As New ListItem
             If (defval Is Nothing) Then
                 objLI.Selected = True
             End If
-            objLI.Text = "--Select--"
-            objLI.Value = ""
+            'Diffrent Text if in a FormGroup
+            If param.FormGroup IsNot "" Then
+                'objLI.Text = ""
+                'objLI.Value = ""
+                If Not WebJEA._default.CachedFormValues.ContainsKey("psparam_" + param.FormGroup) Then
+                    'DefaultValue = WebJEA._default.CachedFormValues.Item("psparam_" + FormGroup)
+                    'psparam.FormGroup = FormGroup
+                    objLI.Text = "Bitte zuerst einen Wert aus dem Feld " + param.PostBackVisibleName + " auswählen."
+                    objLI.Value = ""
+                    showSelection = False
+                Else
+                    objLI.Text = "--Select--"
+                    objLI.Value = ""
+                End If
+            Else
+                objLI.Text = "--Select--"
+                objLI.Value = ""
+            End If
+
             objControl.Items.Add(objLI)
         End If
-        For Each allowedval As String In param.AllowedValues
-            Dim objLI As New ListItem
-            objLI.Value = allowedval
-            objLI.Text = allowedval
-            If allowedval = defval Then
-                objLI.Selected = True
-            End If
-            objControl.Items.Add(objLI)
-        Next
+
+        If showSelection Then
+            For Each allowedval As String In param.AllowedValues
+                Dim objLI As New ListItem
+                objLI.Value = allowedval
+                objLI.Text = allowedval
+                If allowedval = defval Then
+                    objLI.Selected = True
+                End If
+                objControl.Items.Add(objLI)
+            Next
+        End If
+
 
         'label, reqopt, control into row
         objRow.Controls.Add(objLabel)
@@ -511,7 +539,7 @@
 
     Public Function GetControlValidations(param As PSCmdParam) As List(Of WebControl)
         'Mandatory: <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ErrorMessage="Mandatory" SetFocusOnError="True" ControlToValidate="X"></asp:RequiredFieldValidator>
-        'ValidateRange: <asp:RangeValidator ID="RangeValidator1" runat="server" ErrorMessage="RangeValidator" MinimumValue="1" MaximumValue="2" ControlToValidate="txtxX" Text="Not within range (x,y)"></asp:RangeValidator>
+        'ValidateRange: <asp:RangeValidator ID="RangeValidator1" runat="server" ErrorMessage="RangeValidator" MinimumValue="1" MaximumValue="2" ControlToValidate="txtxX" Text="Not within range (x, y)"></asp:RangeValidator>
         'ValidatePattern: <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server" ErrorMessage="RegularExpressionValidator" ControlToValidate="txtX" ValidationExpression=".+"></asp:RegularExpressionValidator>
         'ValidateLength: <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server" ErrorMessage="RegularExpressionValidator" ControlToValidate="txtX" ValidationExpression=".{3,30}"></asp:RegularExpressionValidator>
         'ValidateCount: <asp:CustomValidator ID="CustomValidator1" runat="server" ErrorMessage="CustomValidator" SetFocusOnError="True" ControlToValidate="xxx" ClientValidationFunction="valLb(obj,1,2)"></asp:CustomValidator>
@@ -530,7 +558,7 @@
 
                 Dim valctrl As New CustomValidator
                 valctrl.ClientValidationFunction = "validateMandatoryCheckbox"
-                valctrl.ErrorMessage = "You must check the box for " & param.Name & "."
+                valctrl.ErrorMessage = "You must check the box For " & param.Name & "."
                 valctrl.CssClass = "valmsg"
                 'valctrl.EnableClientScript = True
                 valctrl.SetFocusOnError = True
@@ -542,7 +570,7 @@
             ElseIf valobj.Type = PSCmdParamVal.ValType.Length Then
                 Dim valctrl As New RegularExpressionValidator()
                 valctrl.ValidationExpression = "[\S\s]{" & valobj.LowerLimit & "," & valobj.UpperLimit & "}"
-                valctrl.ErrorMessage = "Not in allowed length (" & valobj.LowerLimit & "-" & valobj.UpperLimit & ")"
+                valctrl.ErrorMessage = "Not In allowed length (" & valobj.LowerLimit & "-" & valobj.UpperLimit & ")"
                 valctrl.CssClass = "valmsg"
                 valctrl.SetFocusOnError = True
                 valctrl.ControlToValidate = param.FieldName
@@ -550,7 +578,7 @@
             ElseIf valobj.Type = PSCmdParamVal.ValType.Pattern Then
                 Dim valctrl As New RegularExpressionValidator()
                 valctrl.ValidationExpression = valobj.Pattern
-                valctrl.ErrorMessage = "Did not match pattern: " & valobj.Pattern
+                valctrl.ErrorMessage = "Did Not match pattern: " & valobj.Pattern
                 valctrl.CssClass = "valmsg"
                 valctrl.SetFocusOnError = True
                 valctrl.ControlToValidate = param.FieldName

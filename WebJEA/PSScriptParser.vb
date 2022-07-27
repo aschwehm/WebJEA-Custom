@@ -13,6 +13,7 @@ Public Class PSScriptParser
     Private prvExamples As New List(Of String)
     Private prvParameterHelp As New Dictionary(Of String, String)
     Private prvParameterVisibleName As New Dictionary(Of String, String)
+    Private prvParameterFormGroup As New Dictionary(Of String, String)
     Private prvPSParam As New List(Of PSCmdParam)
     Private prvIsValid As Boolean = False
 
@@ -29,6 +30,7 @@ Public Class PSScriptParser
         prvExamples = New List(Of String)
         prvParameterHelp = New Dictionary(Of String, String)
         prvParameterVisibleName = New Dictionary(Of String, String)
+        prvParameterFormGroup = New Dictionary(Of String, String)
         prvPSParam = New List(Of PSCmdParam)
         prvIsValid = False
 
@@ -175,6 +177,10 @@ Public Class PSScriptParser
                 Dim paramname As String = header.ToUpper.Replace("VISIBLENAME", "").Trim
                 dlog.Trace("ScriptParser: CommentBlockSection: Adding Description for VISIBLENAME: " & paramname)
                 prvParameterVisibleName.Add(paramname, comment)
+            ElseIf (header.ToUpper.StartsWith("FORMGROUP")) Then
+                Dim paramname As String = header.ToUpper.Replace("FORMGROUP", "").Trim
+                dlog.Trace("ScriptParser: CommentBlockSection: Adding Description for FORMGROUP: " & paramname)
+                prvParameterFormGroup.Add(paramname, comment)
             Else
                 dlog.Error("ScriptParser: Could not parse commentblock: " & header)
             End If
@@ -250,6 +256,18 @@ Public Class PSScriptParser
                     If prvParameterVisibleName.ContainsKey(valstring.ToUpper) Then
                         psparam.VisibleName = prvParameterVisibleName(valstring.ToUpper)
                     End If
+                    If prvParameterFormGroup.ContainsKey(valstring.ToUpper) Then
+                        psparam.FormGroup = prvParameterFormGroup(valstring.ToUpper)
+                    End If
+                    'Set AutoPostBack for WebControlField
+                    If prvParameterFormGroup.ContainsValue(valstring.ToUpper) Then
+                        psparam.AutoPostBack = True
+                    End If
+                    'Set VisibleName for Label Info
+                    If prvParameterFormGroup.ContainsKey(valstring.ToUpper) Then
+                        psparam.PostBackVisibleName = prvParameterVisibleName.Item(prvParameterFormGroup.Item(valstring.ToUpper))
+                    End If
+
                     IDX = closeIDX - 1 'subtract one because we didn't use the matched character and we want to evaluate it on the next step
                 Case "=" 'default value
                     Dim closeIDX As Integer = AdvIndexOf(prvScript, New List(Of String)({",", ")", "#"}), IDX)

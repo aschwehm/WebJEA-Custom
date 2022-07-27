@@ -8,6 +8,7 @@
     Private objTelemetry As New Telemetry
     Public grpfinder As New GroupFinder
     Public cfg As WebJEA.Config
+    Public Shared CachedFormValues As New Hashtable()
     'advanced functions should be able to retrieve the get-help and parameter data, then permit overriding
 
     'cache is the same format, and might contain a bit more, but it also includes the stuff we've calculated from other inputs (say by looking at parameters from advanced functions)
@@ -16,6 +17,20 @@
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         dlog.Trace("Page: Start")
+
+        CachedFormValues.Clear()
+
+        'Get Variables from PostBack and save them in Hashtable
+        If Page.IsPostBack Then
+            For Each key As String In Request.Form.AllKeys
+                If key.Contains("psparam_FPIT") And Request.Form.GetValues(key).GetValue(0) IsNot Nothing Then
+                    Dim keyvalue = Request.Form.GetValues(key).GetValue(0)
+                    If Not keyvalue = "" Then
+                        CachedFormValues.Add(key, keyvalue)
+                    End If
+                End If
+            Next
+        End If
 
         If (Page.Request.QueryString("cmdid") <> Page.User.Identity.Name.Substring(Page.User.Identity.Name.IndexOf("\") + 1)) Then
             dlog.Trace("!!!!!cmdid," + Page.Request.QueryString("cmdid") + ",name," + Page.User.Identity.Name.Substring(Page.User.Identity.Name.IndexOf("\") + 1))
