@@ -50,7 +50,7 @@
                                         <li class="menulink <%#Eval("CSS") %>"><a href="<%#Eval("Uri") %>"><%#Eval("DisplayName") %></a></li>
                                     </ItemTemplate>
                                 </asp:ListView>
-                                <div id="footer" class="footer">Powered by <a href="http://webjea.com" target="_blank">WebJEA</a><asp:Literal runat="server" ID="lblVersion"></asp:Literal>.</div>
+                                <div id="footer" class="footer">Powered by <a href="http://webjea.com" target="_blank">WebJEA</a> and <a href="http://www.fpitsolutions.de" target="_blank">FP-IT Solutions GmbH</a><asp:Literal runat="server" ID="lblVersion"></asp:Literal>.</div>
                             </div>
                         </div>
                     </div>
