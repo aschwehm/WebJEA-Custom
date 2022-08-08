@@ -23,6 +23,9 @@ Change the Display Name of a Field
 Dynamic update of Dropdown Fields in Runtime
 
 
+Dynamicly filled Fields are now cached. As long as the selection of the parent field is not changed the Powershell Script is not triggered again
+
+
 ## Goals
 
 The main goals for WebJEA:
