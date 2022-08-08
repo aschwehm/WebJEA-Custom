@@ -1,4 +1,4 @@
-## This is a custom version of WebJEA which is currently W.I.P. Please do not use in production if you don't know what you are doing.
+## This is a custom version of WebJEA with the ability of dynamicly prefilling certain Fields with Powershell (W.I.P). Please do not use in production if you don't know what you are doing.
 
 WebJEA: PowerShell driven Web Forms for Secure Self-Service
 
