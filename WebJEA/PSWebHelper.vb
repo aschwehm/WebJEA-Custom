@@ -384,6 +384,24 @@
 
     End Function
 
+    Protected Sub OnSelectedIndexChanged(sender As Object, e As EventArgs)
+        Dim tmpSender As New System.Web.UI.WebControls.DropDownList
+        If (WebJEA._default.CachedFormValues.ContainsKey("REFRESH_" + sender.clientID)) Then
+            tmpSender = sender
+            tmpSender.SelectedIndex = 0
+            WebJEA._default.CachedFormValues.Remove("REFRESH_" + sender.clientID)
+            sender = tmpSender
+        End If
+    End Sub
+    Protected Sub OnSelectedIndexChanged2(sender As Object, e As EventArgs)
+        Dim tmpSender As New System.Web.UI.WebControls.DropDownList
+        If (WebJEA._default.CachedFormValues.ContainsKey("REFRESH_" + sender.clientID)) Then
+            tmpSender = sender
+            tmpSender.SelectedIndex = 0
+            WebJEA._default.CachedFormValues.Remove("REFRESH_" + sender.clientID)
+            sender = tmpSender
+        End If
+    End Sub
     Private Function NewControlStringDropdown(pg As Page, param As PSCmdParam) As HtmlControl
 
         Dim objRow As HtmlGenericControl = NewControl("div", "form-group")
@@ -401,6 +419,10 @@
         'SetAutoPostBack for Object
         If param.AutoPostBack = True Then
             objControl.AutoPostBack = True
+            AddHandler objControl.SelectedIndexChanged, AddressOf OnSelectedIndexChanged
+
+        Else
+            AddHandler objControl.Unload, AddressOf OnSelectedIndexChanged2
         End If
 
         'objControl.Text = ReadGetPost(pg, param.Name, "")
@@ -423,19 +445,26 @@
             If param.FormGroup IsNot "" Then
                 'objLI.Text = ""
                 'objLI.Value = ""
-                If Not WebJEA._default.CachedFormValues.ContainsKey("psparam_" + param.FormGroup) Or (Not WebJEA._default.CachedFormValues.ContainsKey("psparam_" + param.BackLinkFormGroup) And Not param.BackLinkFormGroup = "") Then
+                If (Not WebJEA._default.CachedFormValues.ContainsKey("psparam_" + param.FormGroup) Or (Not WebJEA._default.CachedFormValues.ContainsKey("psparam_" + param.BackLinkFormGroup) And Not param.BackLinkFormGroup = "")) Then
                     'DefaultValue = WebJEA._default.CachedFormValues.Item("psparam_" + FormGroup)
                     'psparam.FormGroup = FormGroup
                     objLI.Text = "Bitte zuerst einen Wert aus dem Feld " + param.PostBackVisibleName + " auswählen."
                     objLI.Value = ""
                     showSelection = False
                 Else
-                    objLI.Text = "--Select--"
-                    objLI.Value = ""
+                    If param.AllowedValues(0) = "Keine Daten" Then
+                        objLI.Text = "Das Feld " + param.PostBackVisibleName + " hat keine Daten geliefert."
+                        objLI.Value = ""
+                        showSelection = False
+                    Else
+                        objLI.Text = "--Select--"
+                        objLI.Value = ""
+                    End If
                 End If
             Else
                 objLI.Text = "--Select--"
                 objLI.Value = ""
+
             End If
 
             objControl.Items.Add(objLI)
@@ -453,8 +482,8 @@
             Next
         End If
 
-
         'label, reqopt, control into row
+
         objRow.Controls.Add(objLabel)
         If Not String.IsNullOrWhiteSpace(param.HelpMessage) Then AddMessageHelp(param.HelpMessage, objRow)
         If param.IsMandatory Then AddMessageRequired(objRow)

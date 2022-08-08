@@ -18,15 +18,40 @@
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         dlog.Trace("Page: Start")
 
-        CachedFormValues.Clear()
+        'CachedFormValues.Clear()
+
+        Dim CachedValuesRemove As New List(Of String)
+
+        For Each CachedItem As DictionaryEntry In CachedFormValues
+            If CachedItem.Key.ToString.Substring(0, 7) = "UPDATE_" Then
+                CachedValuesRemove.Add(CachedItem.Key.ToString)
+            End If
+        Next
+
+        For Each ModKey As String In CachedValuesRemove
+            CachedFormValues.Remove(ModKey)
+        Next
+
+
 
         'Get Variables from PostBack and save them in Hashtable
         If Page.IsPostBack Then
             For Each key As String In Request.Form.AllKeys
-                If key.Contains("psparam_FPIT") And Request.Form.GetValues(key).GetValue(0) IsNot Nothing Then
-                    Dim keyvalue = Request.Form.GetValues(key).GetValue(0)
-                    If Not keyvalue = "" Then
-                        CachedFormValues.Add(key, keyvalue)
+                If key.Contains("psparam_FPIT") And Request.Form.GetValues(key).GetValue(0) IsNot Nothing Then 'Es werden nur FPIT Felder Zwischengespeichert
+                    Dim keyvalue = Request.Form.GetValues(key).GetValue(0) 'Er Zieht sich aus dem PostBack die Feldvariable
+                    If Not keyvalue = "" Then 'Falls das Feld leer war dann speichert er auch nichts ab
+                        If CachedFormValues.ContainsKey(key) Then 'Falls es den Key bereits in der Hashtable gibt dann....
+                            If Not CachedFormValues.Item(key) = keyvalue Then '...Prüfe ob sich der Wert geändert hat...
+                                CachedFormValues.Item(key) = keyvalue '... Wenn er sich geändert hat dann mache ein Update vom Wert und....
+                                CachedFormValues.Add("UPDATE_" + key, "") '... erstelle einen zusätzlichen Key damit erkennbar ist das sich was geändert hat.
+                            End If
+                        Else
+                            CachedFormValues.Add(key, keyvalue) 'Falls es keinen Key gibt dann erstelle einen
+                        End If
+                    Else 'Wenn der Rückgabewert leer ist aber im Cache noch ein alter eintrag ist dann muss der raus...
+                        If CachedFormValues.ContainsKey(key) Then
+                            CachedFormValues.Remove(key)
+                        End If
                     End If
                 End If
             Next

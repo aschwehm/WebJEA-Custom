@@ -140,17 +140,46 @@ Public Class PSCmdParam
         'Dim CachedValue As String
         psparam.Name = Name
         psparam.BackLinkFormGroup = BackLinkFormGroup
+        psparam.AutoPostBack = AutoPostBack
 
-        'Set the PostBack Value as Default Value in the Grouped FormField
         If FormGroup IsNot "" Then
+            psparam.FormGroup = FormGroup
+        End If
+
+        '---------
+        If (WebJEA._default.CachedFormValues.ContainsKey("UPDATE_psparam_" + FormGroup)) Then
+            WebJEA._default.CachedFormValues.Remove("UPDATE_psparam_" + FormGroup)
+            If AutoPostBack = False Then
+                psparam.AutoPostBack = True
+                WebJEA._default.CachedFormValues.Add("REFRESH_psparam_" + Name, "")
+            End If
+            If WebJEA._default.CachedFormValues.ContainsKey("psparam_" + Name) Then
+                    WebJEA._default.CachedFormValues.Remove("psparam_" + Name)
+                End If
+                If WebJEA._default.CachedFormValues.ContainsKey("ALLVARS_" + Name) Then
+                    WebJEA._default.CachedFormValues.Remove("ALLVARS_" + Name)
+                End If
+            End If
+
+
+            '---------
+
+            'Set the PostBack Value as Default Value in the Grouped FormField
+            If FormGroup IsNot "" Then
             If WebJEA._default.CachedFormValues IsNot Nothing Then
-                If WebJEA._default.CachedFormValues.Item("psparam_" + BackLinkFormGroup) Is Nothing And Not BackLinkFormGroup = "" Then
+                'If (WebJEA._default.CachedFormValues.Item("psparam_" + BackLinkFormGroup) Is Nothing And Not BackLinkFormGroup = "") Then
+                If Not (WebJEA._default.CachedFormValues.ContainsKey("psparam_" + FormGroup)) Then
                     DefaultValue = ""
                 Else
                     DefaultValue = WebJEA._default.CachedFormValues.Item("psparam_" + FormGroup)
                 End If
-                psparam.FormGroup = FormGroup
+                'psparam.FormGroup = FormGroup
             End If
+        ElseIf (WebJEA._default.CachedFormValues.ContainsKey("psparam_" + Name)) Then
+            DefaultValue = WebJEA._default.CachedFormValues.Item("psparam_" + Name)
+        Else
+
+
         End If
 
 
@@ -166,12 +195,12 @@ Public Class PSCmdParam
         psparam.VarType = VarType
         psparam.DirectiveDateTime = DirectiveDateTime
         psparam.DirectiveMultiline = DirectiveMultiline
-        psparam.AutoPostBack = AutoPostBack
+
         psparam.PostBackVisibleName = PostBackVisibleName
 
         'Sobald in der validate.ps1 eine Variable mit FPIT am Anfang gefunden wird dann spring er aus seinem ursprünglichen Script
 
-        If psparam.Name.Substring(0, 4) = "FPIT" Then
+        If psparam.Name.Substring(0, 4) = "FPIT" And Not WebJEA._default.CachedFormValues.Contains("ALLVARS_" + Name) Then
 
             If DefaultValue = "" Then
                 DefaultValue = "0"
@@ -200,6 +229,7 @@ Public Class PSCmdParam
 
             Ausgabe = Ausgabe.Replace("ÃŸ", "ß")
 
+
             If psparam.Name.Substring(4, 2) = "SL" Then
 
                 'SingleLine (Textbox), einfache Ausgabe
@@ -214,33 +244,43 @@ Public Class PSCmdParam
 
             ElseIf psparam.Name.Substring(4, 2) = "LB" Then
 
-                    Dim arr = Split(Ausgabe, ";")
-                    ReDim Preserve arr(UBound(arr) - 1)
+                Dim arr = Split(Ausgabe, ";")
+                ReDim Preserve arr(UBound(arr) - 1)
 
-                    Dim tmpValidation As String = "VALIDATESET("
-                    Dim MyInList As New System.Collections.Generic.List(Of String)
+                Dim tmpValidation As String = "VALIDATESET("
+                Dim MyInList As New System.Collections.Generic.List(Of String)
 
-                    For Each Eintrag As String In arr
-                        MyInList.Add(Eintrag)
-                        tmpValidation = tmpValidation + "'" + Eintrag + "',"
-                    Next
+                For Each Eintrag As String In arr
+                    MyInList.Add(Eintrag)
+                    tmpValidation = tmpValidation + "'" + Eintrag + "',"
+                Next
 
-                    tmpValidation = Left(tmpValidation, (tmpValidation.Length - 1))
-                    tmpValidation = tmpValidation + ")"
+                tmpValidation = Left(tmpValidation, (tmpValidation.Length - 1))
+                tmpValidation = tmpValidation + ")"
 
                 If tmpValidation = "VALIDATESET)" Then
                     tmpValidation = "VALIDATESET('Keine Daten')"
-                End If
-
-                psparam.AddValidation(tmpValidation)
-
+                    psparam.AddValidation(tmpValidation)
                 Else
-
+                    psparam.AddValidation(tmpValidation)
+                    WebJEA._default.CachedFormValues.Add("ALLVARS_" + Name, tmpValidation)
                 End If
-                '###########
 
-            Else 'Rest der alten Funktion
-                psparam.DefaultValue = DefaultValue
+
+            Else
+
+            End If
+            '###########
+
+        ElseIf psparam.Name.Substring(0, 4) = "FPIT" And WebJEA._default.CachedFormValues.Contains("ALLVARS_" + Name) Then
+            psparam.AddValidation(WebJEA._default.CachedFormValues.Item("ALLVARS_" + Name))
+            If WebJEA._default.CachedFormValues.Contains("psparam_" + Name) Then
+                psparam.DefaultValue = WebJEA._default.CachedFormValues.Item("psparam_" + Name)
+            Else
+                psparam.DefaultValue = ""
+            End If
+        Else 'Rest der alten Funktion
+            psparam.DefaultValue = DefaultValue
 
             For Each val As String In Validation
                 psparam.AddValidation(val)
