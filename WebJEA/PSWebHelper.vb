@@ -67,6 +67,36 @@
         Const repImg As String = "<img class='$1' src='$2' />"
         Dim rgxImg As New Regex(rexImg, rexopt)
 
+        Dim idxx As Int32 = input.LastIndexOf("[[")
+        Dim idyy As Int32 = input.LastIndexOf("]]")
+
+        Dim tmpindex As String = ""
+        Dim tmpindexnew As String = ""
+        Dim intDelta As Int32 = 0
+
+        'remove vbcrlf in TAGs -> Happens when you output an Object inside the TAGs
+        While idxx > -1
+            tmpindex = input.Substring(idxx, (idyy - idxx) + 2) 'wrong Substring
+            tmpindexnew = tmpindex.Replace(vbCr, "").Replace(vbLf, "") 'correct Substring
+
+            intDelta = tmpindex.Length - tmpindexnew.Length 'length delta of both Substrings after shortening
+
+            input = input.Replace(tmpindex, tmpindexnew) 'replace the substring in the input string
+
+            If (idxx > 0) Then
+                idxx = input.LastIndexOf("[[", idxx - 1 - intDelta) 'set new position minus the delta
+                idyy = input.LastIndexOf("]]", idyy - 1 - intDelta)
+            Else
+                idxx = -1
+                idyy = -1
+            End If
+
+            tmpindex = ""
+            tmpindexnew = ""
+            intDelta = 0
+        End While
+
+
         Dim idx As Int32 = input.LastIndexOf("[[")
         While idx > -1
             input = rgxA.Replace(input, repA, 1, idx)
@@ -210,6 +240,18 @@
 
     End Function
 
+    'Sobald ein Datum im Calendar ausgewählt wird
+    Protected Sub OnSelectedDateChanged(sender As Object, e As EventArgs)
+        'Dim tmpSender As New System.Web.UI.WebControls.Calendar
+        'If (WebJEA._default.CachedFormValues.ContainsKey("REFRESH_" + sender.clientID)) Then
+        'tmpSender = sender
+        'Dim blubber As Date = tmpSender.SelectedDate
+
+        'WebJEA._default.CachedFormValues.Remove("REFRESH_" + sender.clientID)
+        '    sender = tmpSender
+        'End If
+    End Sub
+
     Private Function NewControlDate(pg As Page, param As PSCmdParam) As HtmlControl
 
         Dim objRow As HtmlGenericControl = NewControl("div", "form-group")
@@ -220,10 +262,15 @@
         Dim strReqOpt As String = "Required"
         Dim objReqOpt As HtmlControl = NewControl("span", "reqopt", strReqOpt)
 
-
         Dim objControl As New TextBox
+        'Dim objControl As New TextBox
         objControl.ID = param.FieldName
-        objControl.CssClass += " form-control"
+        'objControl.CssClass += " form-control"
+        objControl.BorderStyle = BorderStyle.Outset
+        objControl.TextMode = TextBoxMode.Date
+
+
+        'AddHandler objControl.SelectionChanged, AddressOf OnSelectedDateChanged
 
         If param.DirectiveDateTime Then 'date and time input
             'client-side js will enforce date/time prompt
@@ -235,9 +282,9 @@
 
         'if there's a default value display it
         If Not String.IsNullOrEmpty(param.DefaultValue) Then
-            objControl.Text = param.DefaultValue
+            'objControl.Text = param.DefaultValue
         End If
-        objControl.Text = ReadGetPost(pg, param.Name, objControl.Text)
+        'objControl.Text = ReadGetPost(pg, param.Name, objControl.Text)
 
         'label, reqopt, control into row
         objRow.Controls.Add(objLabel)
