@@ -14,6 +14,8 @@ Prefill Fields/Listboxes of the validate script on PageLoad (Fill Listbox with U
   * Creates a Listbox that can be Pre-Filled
 * $FPITSLXXX
   * Creates a single line Textbox that can be re-Filled
+* $FPITLSXXX
+  * Creates a multiselect Listbox
 
 
 
