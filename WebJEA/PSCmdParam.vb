@@ -242,7 +242,7 @@ Public Class PSCmdParam
 
                 psparam.DefaultValue = Ausgabe
 
-            ElseIf psparam.Name.Substring(4, 2) = "LB" Then
+            ElseIf (psparam.Name.Substring(4, 2) = "LB") Or (psparam.Name.Substring(4, 2) = "LS") Then
 
                 Dim arr = Split(Ausgabe, ";")
                 ReDim Preserve arr(UBound(arr) - 1)

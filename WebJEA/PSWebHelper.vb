@@ -263,14 +263,12 @@
         Dim objReqOpt As HtmlControl = NewControl("span", "reqopt", strReqOpt)
 
         Dim objControl As New TextBox
-        'Dim objControl As New TextBox
         objControl.ID = param.FieldName
-        'objControl.CssClass += " form-control"
+        objControl.CssClass += " form-control"
         objControl.BorderStyle = BorderStyle.Outset
         objControl.TextMode = TextBoxMode.Date
 
-
-        'AddHandler objControl.SelectionChanged, AddressOf OnSelectedDateChanged
+        'AddHandler objControl.Load, AddressOf OnLoadDate
 
         If param.DirectiveDateTime Then 'date and time input
             'client-side js will enforce date/time prompt
@@ -377,11 +375,11 @@
         'objControl.Text = ReadGetPost(pg, param.Name, "")
         If param.IsMultiValued Then
             objControl.SelectionMode = ListSelectionMode.Multiple
-            If param.AllowedValues.Count < 5 Then
-                objControl.Rows = param.AllowedValues.Count
+            If param.AllowedValues.Count <5 Then
+                objControl.Rows= param.AllowedValues.Count
             Else
 
-                objControl.Rows = 5
+                objControl.Rows= 5
             End If
         End If
         objLabel.AssociatedControlID = objControl.ID
@@ -791,12 +789,10 @@
     End Sub
 
     Private Sub GetParameterStringSingle(param As PSCmdParam, page As Page, ByRef params As Dictionary(Of String, Object))
-
         Dim ctrl As TextBox = page.FindControl(param.FieldName)
         If ctrl.Text <> "" Then 'only add the parameter if it is not empty
             params.Add(param.Name, ctrl.Text)
         End If
-
     End Sub
 
     Private Sub GetParameterStringSet(param As PSCmdParam, page As Page, ByRef params As Dictionary(Of String, Object))

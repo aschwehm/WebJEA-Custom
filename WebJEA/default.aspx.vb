@@ -38,8 +38,19 @@
         If Page.IsPostBack Then
             For Each key As String In Request.Form.AllKeys
                 If key.Contains("psparam_FPIT") And Request.Form.GetValues(key).GetValue(0) IsNot Nothing Then 'Es werden nur FPIT Felder Zwischengespeichert
-                    Dim keyvalue = Request.Form.GetValues(key).GetValue(0) 'Er Zieht sich aus dem PostBack die Feldvariable
-                    If Not keyvalue = "" Then 'Falls das Feld leer war dann speichert er auch nichts ab
+                    Dim keyvalue
+                    If Request.Form.GetValues(key).Length > 1 Then
+                        Dim arr() As String = Request.Form.GetValues(key)
+
+                        Dim list As New List(Of String)(arr)
+
+                        keyvalue = list
+                    Else
+                        If Not Request.Form.GetValues(key).GetValue(0) = "" Then
+                            keyvalue = Request.Form.GetValues(key).GetValue(0) 'Er Zieht sich aus dem PostBack die Feldvariable
+                        End If
+                    End If
+                    If Not keyvalue Is Nothing Then 'Falls das Feld leer war dann speichert er auch nichts ab
                         If CachedFormValues.ContainsKey(key) Then 'Falls es den Key bereits in der Hashtable gibt dann....
                             If Not CachedFormValues.Item(key) = keyvalue Then '...Prüfe ob sich der Wert geändert hat...
                                 CachedFormValues.Item(key) = keyvalue '... Wenn er sich geändert hat dann mache ein Update vom Wert und....
