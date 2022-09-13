@@ -2,7 +2,8 @@
 Imports System.Web.Services
 Imports System.Web.Services.Protocols
 Imports System.ComponentModel
-
+Imports Amazon.Runtime
+Imports System.CodeDom.Compiler
 
 Public Class PSCmdParam
     Private dlog As NLog.Logger = NLog.LogManager.GetCurrentClassLogger()
@@ -13,6 +14,7 @@ Public Class PSCmdParam
         PSFloat
         PSDate
         PSBoolean
+        PSButton
     End Enum
 
     Public Name As String
@@ -60,6 +62,8 @@ Public Class PSCmdParam
                 Return ParameterType.PSBoolean
             ElseIf vartypestr Like "int*" Or vartypestr Like "uint*" Or vartypestr Like "byte*" Or vartypestr Like "long*" Then
                 Return ParameterType.PSInt
+            ElseIf vartypestr = "button" Then
+                Return ParameterType.PSButton
             End If
             'by default we treat a value as string.  This includes PSCredential
             Return ParameterType.PSString
@@ -154,22 +158,22 @@ Public Class PSCmdParam
                 WebJEA._default.CachedFormValues.Add("REFRESH_psparam_" + Name, "")
             End If
             If WebJEA._default.CachedFormValues.ContainsKey("psparam_" + Name) Then
-                    WebJEA._default.CachedFormValues.Remove("psparam_" + Name)
-                End If
-                If WebJEA._default.CachedFormValues.ContainsKey("ALLVARS_" + Name) Then
-                    WebJEA._default.CachedFormValues.Remove("ALLVARS_" + Name)
-                End If
+                WebJEA._default.CachedFormValues.Remove("psparam_" + Name)
             End If
+            If WebJEA._default.CachedFormValues.ContainsKey("ALLVARS_" + Name) Then
+                WebJEA._default.CachedFormValues.Remove("ALLVARS_" + Name)
+            End If
+        End If
 
 
-            '---------
+        '---------
 
-            'Set the PostBack Value as Default Value in the Grouped FormField
-            If FormGroup IsNot "" Then
+        'Set the PostBack Value as Default Value in the Grouped FormField
+        If FormGroup IsNot "" Then
             If WebJEA._default.CachedFormValues IsNot Nothing Then
                 'If (WebJEA._default.CachedFormValues.Item("psparam_" + BackLinkFormGroup) Is Nothing And Not BackLinkFormGroup = "") Then
                 If Not (WebJEA._default.CachedFormValues.ContainsKey("psparam_" + FormGroup)) Then
-                    DefaultValue = ""
+                    DefaultValue = Nothing
                 Else
                     DefaultValue = WebJEA._default.CachedFormValues.Item("psparam_" + FormGroup)
                 End If
@@ -178,7 +182,7 @@ Public Class PSCmdParam
         ElseIf (WebJEA._default.CachedFormValues.ContainsKey("psparam_" + Name)) Then
             DefaultValue = WebJEA._default.CachedFormValues.Item("psparam_" + Name)
         Else
-
+            DefaultValue = DefaultValue
 
         End If
 
@@ -202,33 +206,41 @@ Public Class PSCmdParam
 
         If psparam.Name.Substring(0, 4) = "FPIT" And Not WebJEA._default.CachedFormValues.Contains("ALLVARS_" + Name) Then
 
-            If DefaultValue = "" Then
-                DefaultValue = "0"
+            Dim Ausgabe As String = ""
+
+            If (FormGroup Is "" And DefaultValue Is Nothing) Or (FormGroup IsNot "" And DefaultValue IsNot Nothing) Then
+
+
+
+                If DefaultValue = "" Or DefaultValue = Nothing And Not (ParamType = ParameterType.PSButton) Then
+                    DefaultValue = "0"
+                End If
+
+                'Aufruf externes Powershell Script
+                'script.ps1 <VariablenName> <Wert>  C:\temp\WebJEA\WebJea-Scripts\test.ps1
+                Dim FPIT_Path = WebJEA.My.Settings.configfile
+                FPIT_Path = FPIT_Path.Replace("config.json", "FPIT_Commands.ps1")
+                Dim pscommand As String = FPIT_Path & " " & psparam.Name & " " & DefaultValue & "; exit $LASTEXITCODE"
+                Dim cmd As String = "powershell.exe -noprofile -NonInteractive -WindowStyle hidden -command " & pscommand
+                Dim shell = CreateObject("WScript.Shell")
+                Dim executor = shell.Exec(cmd)
+                executor.StdIn.Close
+
+                Ausgabe = executor.StdOut.ReadAll
+
+                'Filter Special Characters
+                Ausgabe = Ausgabe.Replace("Ã¤", "ä")
+                Ausgabe = Ausgabe.Replace("Ã¼", "ü")
+                Ausgabe = Ausgabe.Replace("Ã¶", "ö")
+
+                Ausgabe = Ausgabe.Replace("Ã„", "Ä")
+                Ausgabe = Ausgabe.Replace("Ãœ", "Ü")
+                Ausgabe = Ausgabe.Replace("Ã–", "Ö")
+
+                Ausgabe = Ausgabe.Replace("ÃŸ", "ß")
+            Else
+                Ausgabe = ""
             End If
-
-            'Aufruf externes Powershell Script
-            'script.ps1 <VariablenName> <Wert>  C:\temp\WebJEA\WebJea-Scripts\test.ps1
-            Dim FPIT_Path = WebJEA.My.Settings.configfile
-            FPIT_Path = FPIT_Path.Replace("config.json", "FPIT_Commands.ps1")
-            Dim pscommand As String = FPIT_Path & " " & psparam.Name & " " & DefaultValue & "; exit $LASTEXITCODE"
-            Dim cmd As String = "powershell.exe -noprofile -NonInteractive -WindowStyle hidden -command " & pscommand
-            Dim shell = CreateObject("WScript.Shell")
-            Dim executor = shell.Exec(cmd)
-            executor.StdIn.Close
-
-            Dim Ausgabe As String = executor.StdOut.ReadAll
-
-            'Filter Special Characters
-            Ausgabe = Ausgabe.Replace("Ã¤", "ä")
-            Ausgabe = Ausgabe.Replace("Ã¼", "ü")
-            Ausgabe = Ausgabe.Replace("Ã¶", "ö")
-
-            Ausgabe = Ausgabe.Replace("Ã„", "Ä")
-            Ausgabe = Ausgabe.Replace("Ãœ", "Ü")
-            Ausgabe = Ausgabe.Replace("Ã–", "Ö")
-
-            Ausgabe = Ausgabe.Replace("ÃŸ", "ß")
-
 
             If psparam.Name.Substring(4, 2) = "SL" Then
 
@@ -241,6 +253,10 @@ Public Class PSCmdParam
                 psparam.DirectiveMultiline = True
 
                 psparam.DefaultValue = Ausgabe
+            ElseIf psparam.Name.Substring(4, 2) = "BT" Then
+
+                'Button
+                psparam.DefaultValue = DefaultValue
 
             ElseIf (psparam.Name.Substring(4, 2) = "LB") Or (psparam.Name.Substring(4, 2) = "LS") Then
 
@@ -270,6 +286,7 @@ Public Class PSCmdParam
             Else
 
             End If
+
             '###########
 
         ElseIf psparam.Name.Substring(0, 4) = "FPIT" And WebJEA._default.CachedFormValues.Contains("ALLVARS_" + Name) Then
@@ -277,7 +294,7 @@ Public Class PSCmdParam
             If WebJEA._default.CachedFormValues.Contains("psparam_" + Name) Then
                 psparam.DefaultValue = WebJEA._default.CachedFormValues.Item("psparam_" + Name)
             Else
-                psparam.DefaultValue = ""
+                psparam.DefaultValue = Nothing
             End If
         Else 'Rest der alten Funktion
             psparam.DefaultValue = DefaultValue

@@ -1,4 +1,8 @@
-﻿Public Class PSWebHelper
+﻿Imports System.ComponentModel.Design
+Imports System.Drawing
+Imports System.Net.Sockets
+
+Public Class PSWebHelper
     Private dlog As NLog.Logger = NLog.LogManager.GetCurrentClassLogger()
 
 
@@ -159,6 +163,8 @@
                             'TODO: add support for int field
                             'numbers are strings, we just need to add a bit of special validation and some files
                             retcontrols.Add(NewControlString(pg, param))
+                        Case PSCmdParam.ParameterType.PSButton
+                            retcontrols.Add(NewControlButton(pg, param))
                         Case Else
                             dlog.Warn("PSWebHelper: Defaulting to string for unknown type: " & param.VarType & " paramname: " & param.Name)
                             retcontrols.Add(NewControlString(pg, param))
@@ -234,6 +240,56 @@
         For Each valctrl In valctrls
             objRow.Controls.Add(valctrl)
         Next
+
+
+        Return objRow
+
+    End Function
+
+    Protected Sub OnButtonPress(sender As Object, e As EventArgs)
+
+        Dim FPIT_Path = WebJEA.My.Settings.configfile
+        Dim tmpName = sender.clientid.ToString.Replace("psparam_", "")
+
+        FPIT_Path = FPIT_Path.Replace("config.json", tmpName + ".ps1")
+        Dim pscommand As String = FPIT_Path & "; exit $LASTEXITCODE"
+        Dim cmd As String = "powershell.exe -noprofile -NonInteractive -WindowStyle hidden -command " & pscommand
+        Dim shell = CreateObject("WScript.Shell")
+        Dim executor = shell.Exec(cmd)
+        executor.StdIn.Close
+
+        'Ausgabe = executor.StdOut.ReadAll
+
+    End Sub
+
+    Private Function NewControlButton(pg As Page, param As PSCmdParam) As HtmlControl
+
+        Dim objRow As HtmlGenericControl = NewControl("div", "form-group")
+
+        'generate string inputs
+        Dim objLabel As Label = NewControlLabel(param.VisibleName)
+
+        Dim objControl As New Button
+        objControl.ID = param.FieldName
+        objControl.CssClass += " form-control"
+        objControl.BorderStyle = BorderStyle.Ridge
+        objControl.BackColor = System.Drawing.ColorTranslator.FromHtml("#e2f0dd")
+
+        objLabel.AssociatedControlID = objControl.ID
+
+        AddHandler objControl.Click, AddressOf OnButtonPress
+
+        objControl.Text = param.VisibleName
+
+        'label, reqopt, control into row
+        objRow.Controls.Add(objLabel)
+        If Not String.IsNullOrWhiteSpace(param.HelpMessage) Then AddMessageHelp(param.HelpMessage, objRow)
+        If param.IsMandatory Then AddMessageRequired(objRow)
+        objRow.Controls.Add(objControl)
+        '   then help
+        If Not String.IsNullOrEmpty(param.HelpDetail) Then AddMessageHelpDetail(param.HelpDetail, objRow)
+
+
 
 
         Return objRow
@@ -357,6 +413,11 @@
 
     End Function
 
+    'Protected Sub OnSelectedItemChange(sender As Object, e As EventArgs)
+    'Dim blub As String
+    '   blub = "blubber"
+    'End Sub
+
     Private Function NewControlStringListbox(pg As Page, param As PSCmdParam) As HtmlControl
 
         Dim objRow As HtmlGenericControl = NewControl("div", "form-group")
@@ -372,15 +433,18 @@
         objControl.ID = param.FieldName
         objControl.CssClass += " form-control"
         objControl.SelectionMode = ListSelectionMode.Single
+
+
         'objControl.Text = ReadGetPost(pg, param.Name, "")
         If param.IsMultiValued Then
             objControl.SelectionMode = ListSelectionMode.Multiple
-            If param.AllowedValues.Count <5 Then
-                objControl.Rows= param.AllowedValues.Count
+            If param.AllowedValues.Count < 5 Then
+                objControl.Rows = param.AllowedValues.Count
             Else
-
-                objControl.Rows= 5
+                objControl.Rows = 5
             End If
+            'objControl.AutoPostBack = True
+            'AddHandler objControl.SelectedIndexChanged, AddressOf OnSelectedItemChange
         End If
         objLabel.AssociatedControlID = objControl.ID
 
@@ -393,13 +457,16 @@
         End If
 
         If param.IsMandatory = False Then
-            Dim objLI As New ListItem
-            If param.DefaultValue Is Nothing Then
-                objLI.Selected = True
+            If Not param.Name.Contains("FPITLS") Then
+                Dim objLI As New ListItem
+                If param.DefaultValue Is Nothing Then
+                    objLI.Selected = True
+                End If
+                objLI.Text = "--Select--"
+                objLI.Value = "--Select--"
+                objControl.Items.Add(objLI)
             End If
-            objLI.Text = "--Select--"
-            objLI.Value = "--Select--"
-            objControl.Items.Add(objLI)
+
         End If
 
         For Each allowedval As String In param.AllowedValues
@@ -507,6 +574,7 @@
                     End If
                 End If
             Else
+
                 objLI.Text = "--Select--"
                 objLI.Value = ""
 

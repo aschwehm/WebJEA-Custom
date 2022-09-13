@@ -398,6 +398,8 @@ Public Class PSScriptParser
             psparam.VarType = valstring
         ElseIf valstring.StartsWith("string", StringComparison.InvariantCultureIgnoreCase) Then
             psparam.VarType = valstring
+        ElseIf valstring.StartsWith("button", StringComparison.InvariantCultureIgnoreCase) Then
+            psparam.VarType = valstring
 
             '**************************
             'Ignore These

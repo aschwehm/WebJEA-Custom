@@ -1,4 +1,6 @@
-﻿Public Class _default
+﻿Imports System.Management.Automation.Language
+
+Public Class _default
     Inherits System.Web.UI.Page
     Dim cmdid As String
 
@@ -39,7 +41,8 @@
             For Each key As String In Request.Form.AllKeys
                 If key.Contains("psparam_FPIT") And Request.Form.GetValues(key).GetValue(0) IsNot Nothing Then 'Es werden nur FPIT Felder Zwischengespeichert
                     Dim keyvalue
-                    If Request.Form.GetValues(key).Length > 1 Then
+                    If key.Contains("psparam_FPITLS") Then '(Request.Form.GetValues(key).Length > 1) And 
+
                         Dim arr() As String = Request.Form.GetValues(key)
 
                         Dim list As New List(Of String)(arr)
@@ -64,6 +67,7 @@
                             CachedFormValues.Remove(key)
                         End If
                     End If
+                    keyvalue = Nothing
                 End If
             Next
         End If
