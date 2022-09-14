@@ -47,6 +47,10 @@ Public Class Global_asax
 
     Sub Session_End(ByVal sender As Object, ByVal e As EventArgs)
         ' Fires when the session ends
+        If WebJEA._default.SessionValues.ContainsKey(Session.SessionID) Then
+            WebJEA._default.SessionValues.Remove(Session.SessionID)
+        End If
+
     End Sub
 
     Sub Application_End(ByVal sender As Object, ByVal e As EventArgs)

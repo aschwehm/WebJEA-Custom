@@ -251,6 +251,8 @@ Public Class PSWebHelper
         Dim FPIT_Path = WebJEA.My.Settings.configfile
         Dim tmpName = sender.clientid.ToString.Replace("psparam_", "")
 
+
+
         FPIT_Path = FPIT_Path.Replace("config.json", tmpName + ".ps1")
         Dim pscommand As String = FPIT_Path & "; exit $LASTEXITCODE"
         Dim cmd As String = "powershell.exe -noprofile -NonInteractive -WindowStyle hidden -command " & pscommand
@@ -279,7 +281,8 @@ Public Class PSWebHelper
 
         AddHandler objControl.Click, AddressOf OnButtonPress
 
-        objControl.Text = param.VisibleName
+        'Shown Text of Button
+        objControl.Text = "Skript ausführen"
 
         'label, reqopt, control into row
         objRow.Controls.Add(objLabel)
@@ -497,24 +500,29 @@ Public Class PSWebHelper
     End Function
 
     Protected Sub OnSelectedIndexChanged(sender As Object, e As EventArgs)
+        Dim SessionID = HttpContext.Current.Session.SessionID
+
         Dim tmpSender As New System.Web.UI.WebControls.DropDownList
-        If (WebJEA._default.CachedFormValues.ContainsKey("REFRESH_" + sender.clientID)) Then
+        If (WebJEA._default.SessionValues.Item(SessionID).ContainsKey("REFRESH_" + sender.clientID)) Then
             tmpSender = sender
             tmpSender.SelectedIndex = 0
-            WebJEA._default.CachedFormValues.Remove("REFRESH_" + sender.clientID)
+            WebJEA._default.SessionValues.Item(SessionID).Remove("REFRESH_" + sender.clientID)
             sender = tmpSender
         End If
     End Sub
     Protected Sub OnSelectedIndexChanged2(sender As Object, e As EventArgs)
+        Dim SessionID = HttpContext.Current.Session.SessionID
+
         Dim tmpSender As New System.Web.UI.WebControls.DropDownList
-        If (WebJEA._default.CachedFormValues.ContainsKey("REFRESH_" + sender.clientID)) Then
+        If (WebJEA._default.SessionValues.Item(SessionID).ContainsKey("REFRESH_" + sender.clientID)) Then
             tmpSender = sender
             tmpSender.SelectedIndex = 0
-            WebJEA._default.CachedFormValues.Remove("REFRESH_" + sender.clientID)
+            WebJEA._default.SessionValues.Item(SessionID).Remove("REFRESH_" + sender.clientID)
             sender = tmpSender
         End If
     End Sub
     Private Function NewControlStringDropdown(pg As Page, param As PSCmdParam) As HtmlControl
+        Dim SessionID = HttpContext.Current.Session.SessionID
 
         Dim objRow As HtmlGenericControl = NewControl("div", "form-group")
 
@@ -557,8 +565,8 @@ Public Class PSWebHelper
             If param.FormGroup IsNot "" Then
                 'objLI.Text = ""
                 'objLI.Value = ""
-                If (Not WebJEA._default.CachedFormValues.ContainsKey("psparam_" + param.FormGroup) Or (Not WebJEA._default.CachedFormValues.ContainsKey("psparam_" + param.BackLinkFormGroup) And Not param.BackLinkFormGroup = "")) Then
-                    'DefaultValue = WebJEA._default.CachedFormValues.Item("psparam_" + FormGroup)
+                If (Not WebJEA._default.SessionValues.Item(SessionId).ContainsKey("psparam_" + param.FormGroup) Or (Not WebJEA._default.SessionValues.Item(SessionId).ContainsKey("psparam_" + param.BackLinkFormGroup) And Not param.BackLinkFormGroup = "")) Then
+                    'DefaultValue = WebJEA._default.SessionValues.Item(SessionID).Item("psparam_" + FormGroup)
                     'psparam.FormGroup = FormGroup
                     objLI.Text = "Bitte zuerst einen Wert aus dem Feld " + param.PostBackVisibleName + " auswählen."
                     objLI.Value = ""

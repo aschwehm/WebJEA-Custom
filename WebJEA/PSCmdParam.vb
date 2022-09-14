@@ -151,17 +151,19 @@ Public Class PSCmdParam
         End If
 
         '---------
-        If (WebJEA._default.CachedFormValues.ContainsKey("UPDATE_psparam_" + FormGroup)) Then
-            WebJEA._default.CachedFormValues.Remove("UPDATE_psparam_" + FormGroup)
+        Dim SessionID = HttpContext.Current.Session.SessionID
+
+        If (WebJEA._default.SessionValues.Item(SessionID).ContainsKey("UPDATE_psparam_" + FormGroup)) Then
+            WebJEA._default.SessionValues.Item(SessionID).Remove("UPDATE_psparam_" + FormGroup)
             If AutoPostBack = False Then
                 psparam.AutoPostBack = True
-                WebJEA._default.CachedFormValues.Add("REFRESH_psparam_" + Name, "")
+                WebJEA._default.SessionValues.Item(SessionID).Add("REFRESH_psparam_" + Name, "")
             End If
-            If WebJEA._default.CachedFormValues.ContainsKey("psparam_" + Name) Then
-                WebJEA._default.CachedFormValues.Remove("psparam_" + Name)
+            If WebJEA._default.SessionValues.Item(SessionID).ContainsKey("psparam_" + Name) Then
+                WebJEA._default.SessionValues.Item(SessionID).Remove("psparam_" + Name)
             End If
-            If WebJEA._default.CachedFormValues.ContainsKey("ALLVARS_" + Name) Then
-                WebJEA._default.CachedFormValues.Remove("ALLVARS_" + Name)
+            If WebJEA._default.SessionValues.Item(SessionID).ContainsKey("ALLVARS_" + Name) Then
+                WebJEA._default.SessionValues.Item(SessionID).Remove("ALLVARS_" + Name)
             End If
         End If
 
@@ -170,17 +172,17 @@ Public Class PSCmdParam
 
         'Set the PostBack Value as Default Value in the Grouped FormField
         If FormGroup IsNot "" Then
-            If WebJEA._default.CachedFormValues IsNot Nothing Then
-                'If (WebJEA._default.CachedFormValues.Item("psparam_" + BackLinkFormGroup) Is Nothing And Not BackLinkFormGroup = "") Then
-                If Not (WebJEA._default.CachedFormValues.ContainsKey("psparam_" + FormGroup)) Then
+            If WebJEA._default.SessionValues.Item(SessionID) IsNot Nothing Then
+                'If (WebJEA._default.SessionValues.Item(SessionID).Item("psparam_" + BackLinkFormGroup) Is Nothing And Not BackLinkFormGroup = "") Then
+                If Not (WebJEA._default.SessionValues.Item(SessionID).ContainsKey("psparam_" + FormGroup)) Then
                     DefaultValue = Nothing
                 Else
-                    DefaultValue = WebJEA._default.CachedFormValues.Item("psparam_" + FormGroup)
+                    DefaultValue = WebJEA._default.SessionValues.Item(SessionID).Item("psparam_" + FormGroup)
                 End If
                 'psparam.FormGroup = FormGroup
             End If
-        ElseIf (WebJEA._default.CachedFormValues.ContainsKey("psparam_" + Name)) Then
-            DefaultValue = WebJEA._default.CachedFormValues.Item("psparam_" + Name)
+        ElseIf (WebJEA._default.SessionValues.Item(SessionID).ContainsKey("psparam_" + Name)) Then
+            DefaultValue = WebJEA._default.SessionValues.Item(SessionID).Item("psparam_" + Name)
         Else
             DefaultValue = DefaultValue
 
@@ -204,7 +206,7 @@ Public Class PSCmdParam
 
         'Sobald in der validate.ps1 eine Variable mit FPIT am Anfang gefunden wird dann spring er aus seinem ursprünglichen Script
 
-        If psparam.Name.Substring(0, 4) = "FPIT" And Not WebJEA._default.CachedFormValues.Contains("ALLVARS_" + Name) Then
+        If psparam.Name.Substring(0, 4) = "FPIT" And Not WebJEA._default.SessionValues.Item(SessionID).Contains("ALLVARS_" + Name) Then
 
             Dim Ausgabe As String = ""
 
@@ -279,7 +281,7 @@ Public Class PSCmdParam
                     psparam.AddValidation(tmpValidation)
                 Else
                     psparam.AddValidation(tmpValidation)
-                    WebJEA._default.CachedFormValues.Add("ALLVARS_" + Name, tmpValidation)
+                    WebJEA._default.SessionValues.Item(SessionID).Add("ALLVARS_" + Name, tmpValidation)
                 End If
 
 
@@ -289,10 +291,10 @@ Public Class PSCmdParam
 
             '###########
 
-        ElseIf psparam.Name.Substring(0, 4) = "FPIT" And WebJEA._default.CachedFormValues.Contains("ALLVARS_" + Name) Then
-            psparam.AddValidation(WebJEA._default.CachedFormValues.Item("ALLVARS_" + Name))
-            If WebJEA._default.CachedFormValues.Contains("psparam_" + Name) Then
-                psparam.DefaultValue = WebJEA._default.CachedFormValues.Item("psparam_" + Name)
+        ElseIf psparam.Name.Substring(0, 4) = "FPIT" And WebJEA._default.SessionValues.Item(SessionID).Contains("ALLVARS_" + Name) Then
+            psparam.AddValidation(WebJEA._default.SessionValues.Item(SessionID).Item("ALLVARS_" + Name))
+            If WebJEA._default.SessionValues.Item(SessionID).Contains("psparam_" + Name) Then
+                psparam.DefaultValue = WebJEA._default.SessionValues.Item(SessionID).Item("psparam_" + Name)
             Else
                 psparam.DefaultValue = Nothing
             End If
