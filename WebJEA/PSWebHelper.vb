@@ -276,10 +276,10 @@ Public Class PSWebHelper
         objControl.CssClass += " form-control"
         objControl.BorderStyle = BorderStyle.Ridge
         objControl.BackColor = System.Drawing.ColorTranslator.FromHtml("#e2f0dd")
-
+        objControl.UseSubmitBehavior = False
         objLabel.AssociatedControlID = objControl.ID
 
-        AddHandler objControl.Click, AddressOf OnButtonPress
+        'AddHandler objControl.Click, AddressOf OnButtonPress
 
         'Shown Text of Button
         objControl.Text = "Skript ausführen"
@@ -292,7 +292,20 @@ Public Class PSWebHelper
         '   then help
         If Not String.IsNullOrEmpty(param.HelpDetail) Then AddMessageHelpDetail(param.HelpDetail, objRow)
 
+        If param.DefaultValue_BT IsNot Nothing Then
+            Dim objControl2 As New TextBox
 
+            objControl2.TextMode = TextBoxMode.MultiLine
+            objControl2.Rows = 5
+            objControl2.Columns = 100
+            objControl2.BorderColor = System.Drawing.ColorTranslator.FromHtml("#c4e3a6")
+            objControl2.BorderWidth = 3
+            objControl2.CssClass += " form-control"
+            objControl2.Text = param.DefaultValue_BT
+            objControl2.Enabled = False
+
+            objRow.Controls.Add(objControl2)
+        End If
 
 
         Return objRow
@@ -436,7 +449,6 @@ Public Class PSWebHelper
         objControl.ID = param.FieldName
         objControl.CssClass += " form-control"
         objControl.SelectionMode = ListSelectionMode.Single
-
 
         'objControl.Text = ReadGetPost(pg, param.Name, "")
         If param.IsMultiValued Then

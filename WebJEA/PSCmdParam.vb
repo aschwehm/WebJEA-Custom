@@ -29,6 +29,7 @@ Public Class PSCmdParam
     Public DirectiveDateTime As Boolean = False
     Public VarType As String = ""
     Public DefaultValue As Object = Nothing
+    Public DefaultValue_BT As Object = Nothing
     'TODO: Add support for more than just string default values - can we support arrays?
     Public Validation As New List(Of String)
     'Private prvValidation As New List(Of PSCmdParamVal)
@@ -166,8 +167,6 @@ Public Class PSCmdParam
                 WebJEA._default.SessionValues.Item(SessionID).Remove("ALLVARS_" + Name)
             End If
         End If
-
-
         '---------
 
         'Set the PostBack Value as Default Value in the Grouped FormField
@@ -212,36 +211,50 @@ Public Class PSCmdParam
 
             If (FormGroup Is "" And DefaultValue Is Nothing) Or (FormGroup IsNot "" And DefaultValue IsNot Nothing) Then
 
+                If WebJEA._default.SessionValues.Item(SessionID).Contains("EXEC_" + Name) Then 'If its a Button and has a DefaultValue from a FormGroup Field then execute the additional Script
+                    WebJEA._default.SessionValues.Item(SessionID).Remove("EXEC_" + Name)
+
+                    Dim FPIT_Path = WebJEA.My.Settings.configfile
+                    FPIT_Path = FPIT_Path.Replace("config.json", Name + ".ps1")
+                    Dim pscommand As String = FPIT_Path & " " & DefaultValue & "; exit $LASTEXITCODE"
+                    Dim cmd As String = "powershell.exe -noprofile -NonInteractive -WindowStyle hidden -command " & pscommand
+                    Dim shell = CreateObject("WScript.Shell")
+                    Dim executor = shell.Exec(cmd)
+                    executor.StdIn.Close
+
+                    psparam.DefaultValue_BT = executor.StdOut.ReadAll
 
 
-                If DefaultValue = "" Or DefaultValue = Nothing And Not (ParamType = ParameterType.PSButton) Then
-                    DefaultValue = "0"
+                Else 'If its not a button then normally execute the external Script to prefill Fields
+                    If DefaultValue = "" Or DefaultValue = Nothing And Not (ParamType = ParameterType.PSButton) Then
+                        DefaultValue = "0"
+                    End If
+
+                    'Aufruf externes Powershell Script
+                    'script.ps1 <VariablenName> <Wert>  C:\temp\WebJEA\WebJea-Scripts\test.ps1
+                    Dim FPIT_Path = WebJEA.My.Settings.configfile
+                    FPIT_Path = FPIT_Path.Replace("config.json", "FPIT_Commands.ps1")
+                    Dim pscommand As String = FPIT_Path & " " & psparam.Name & " " & DefaultValue & "; exit $LASTEXITCODE"
+                    Dim cmd As String = "powershell.exe -noprofile -NonInteractive -WindowStyle hidden -command " & pscommand
+                    Dim shell = CreateObject("WScript.Shell")
+                    Dim executor = shell.Exec(cmd)
+                    executor.StdIn.Close
+
+                    Ausgabe = executor.StdOut.ReadAll
+
+                    'Filter Special Characters
+                    Ausgabe = Ausgabe.Replace("Ã¤", "ä")
+                    Ausgabe = Ausgabe.Replace("Ã¼", "ü")
+                    Ausgabe = Ausgabe.Replace("Ã¶", "ö")
+
+                    Ausgabe = Ausgabe.Replace("Ã„", "Ä")
+                    Ausgabe = Ausgabe.Replace("Ãœ", "Ü")
+                    Ausgabe = Ausgabe.Replace("Ã–", "Ö")
+
+                    Ausgabe = Ausgabe.Replace("ÃŸ", "ß")
                 End If
-
-                'Aufruf externes Powershell Script
-                'script.ps1 <VariablenName> <Wert>  C:\temp\WebJEA\WebJea-Scripts\test.ps1
-                Dim FPIT_Path = WebJEA.My.Settings.configfile
-                FPIT_Path = FPIT_Path.Replace("config.json", "FPIT_Commands.ps1")
-                Dim pscommand As String = FPIT_Path & " " & psparam.Name & " " & DefaultValue & "; exit $LASTEXITCODE"
-                Dim cmd As String = "powershell.exe -noprofile -NonInteractive -WindowStyle hidden -command " & pscommand
-                Dim shell = CreateObject("WScript.Shell")
-                Dim executor = shell.Exec(cmd)
-                executor.StdIn.Close
-
-                Ausgabe = executor.StdOut.ReadAll
-
-                'Filter Special Characters
-                Ausgabe = Ausgabe.Replace("Ã¤", "ä")
-                Ausgabe = Ausgabe.Replace("Ã¼", "ü")
-                Ausgabe = Ausgabe.Replace("Ã¶", "ö")
-
-                Ausgabe = Ausgabe.Replace("Ã„", "Ä")
-                Ausgabe = Ausgabe.Replace("Ãœ", "Ü")
-                Ausgabe = Ausgabe.Replace("Ã–", "Ö")
-
-                Ausgabe = Ausgabe.Replace("ÃŸ", "ß")
             Else
-                Ausgabe = ""
+                Ausgabe = Nothing
             End If
 
             If psparam.Name.Substring(4, 2) = "SL" Then

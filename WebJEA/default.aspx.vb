@@ -1,4 +1,5 @@
-﻿Imports System.Management.Automation.Language
+﻿Imports System.Management.Automation
+Imports System.Management.Automation.Language
 
 Public Class _default
     Inherits System.Web.UI.Page
@@ -49,7 +50,23 @@ Public Class _default
 
         'Get Variables from PostBack and save them in Hashtable
         If Page.IsPostBack Then
+
             For Each key As String In Request.Form.AllKeys
+
+                'Creates an Entry for Button Presses so another Function can execute an extra script
+                If key.Equals("__EVENTTARGET") Then
+                    If Request.Form.GetValues(key).GetValue(0) IsNot "" And (Request.Form.GetValues(key).GetValue(0)).ToString.Substring(0, 14) = "psparam_FPITBT" Then
+                        Dim tmpEvent As String = Request.Form.GetValues(key).GetValue(0)
+                        tmpEvent = tmpEvent.Replace("psparam_", "")
+
+                        If SessionValues.Item(Session.SessionID).ContainsKey("EXEC_" + tmpEvent) Then
+                            SessionValues.Item(Session.SessionID).Remove("EXEC_" + tmpEvent)
+                        End If
+
+                        SessionValues.Item(Session.SessionID).Add("EXEC_" + tmpEvent, "")
+                    End If
+                End If
+                ''''''''''
                 If key.Contains("psparam_FPIT") And Request.Form.GetValues(key).GetValue(0) IsNot Nothing Then 'Es werden nur FPIT Felder Zwischengespeichert
                     Dim keyvalue
                     If key.Contains("psparam_FPITLS") Then '(Request.Form.GetValues(key).Length > 1) And 
