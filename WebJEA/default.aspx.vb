@@ -55,15 +55,17 @@ Public Class _default
 
                 'Creates an Entry for Button Presses so another Function can execute an extra script
                 If key.Equals("__EVENTTARGET") Then
-                    If Request.Form.GetValues(key).GetValue(0) IsNot "" And (Request.Form.GetValues(key).GetValue(0)).ToString.Substring(0, 14) = "psparam_FPITBT" Then
-                        Dim tmpEvent As String = Request.Form.GetValues(key).GetValue(0)
-                        tmpEvent = tmpEvent.Replace("psparam_", "")
+                    If Request.Form.GetValues(key).GetValue(0) IsNot "" And Not (Request.Form.GetValues(key).GetValue(0).ToString.Length() = 0) Then
+                        If (Request.Form.GetValues(key).GetValue(0)).ToString.Substring(0, 14) = "psparam_FPITBT" Then
+                            Dim tmpEvent As String = Request.Form.GetValues(key).GetValue(0)
+                            tmpEvent = tmpEvent.Replace("psparam_", "")
 
-                        If SessionValues.Item(Session.SessionID).ContainsKey("EXEC_" + tmpEvent) Then
-                            SessionValues.Item(Session.SessionID).Remove("EXEC_" + tmpEvent)
+                            If SessionValues.Item(Session.SessionID).ContainsKey("EXEC_" + tmpEvent) Then
+                                SessionValues.Item(Session.SessionID).Remove("EXEC_" + tmpEvent)
+                            End If
+
+                            SessionValues.Item(Session.SessionID).Add("EXEC_" + tmpEvent, "")
                         End If
-
-                        SessionValues.Item(Session.SessionID).Add("EXEC_" + tmpEvent, "")
                     End If
                 End If
                 ''''''''''

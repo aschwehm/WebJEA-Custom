@@ -158,7 +158,11 @@ Public Class PSCmdParam
             WebJEA._default.SessionValues.Item(SessionID).Remove("UPDATE_psparam_" + FormGroup)
             If AutoPostBack = False Then
                 psparam.AutoPostBack = True
-                WebJEA._default.SessionValues.Item(SessionID).Add("REFRESH_psparam_" + Name, "")
+
+                If WebJEA._default.SessionValues.Item(SessionID).ContainsKey("REFRESH_psparam_" + Name) Then
+                    WebJEA._default.SessionValues.Item(SessionID).Remove("REFRESH_psparam_" + Name)
+                    WebJEA._default.SessionValues.Item(SessionID).Add("REFRESH_psparam_" + Name, "")
+                End If
             End If
             If WebJEA._default.SessionValues.Item(SessionID).ContainsKey("psparam_" + Name) Then
                 WebJEA._default.SessionValues.Item(SessionID).Remove("psparam_" + Name)

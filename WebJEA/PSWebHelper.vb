@@ -279,7 +279,7 @@ Public Class PSWebHelper
         objControl.UseSubmitBehavior = False
         objLabel.AssociatedControlID = objControl.ID
 
-        'AddHandler objControl.Click, AddressOf OnButtonPress
+        AddHandler objControl.Click, AddressOf OnButtonPress
 
         'Shown Text of Button
         objControl.Text = "Skript ausführen"
@@ -809,6 +809,8 @@ Public Class PSWebHelper
                     GetParameterString(param, page, params)
                 ElseIf (param.ParamType = PSCmdParam.ParameterType.PSDate) Then
                     GetParameterString(param, page, params)
+                ElseIf (param.ParamType = PSCmdParam.ParameterType.PSButton) Then
+                    GetParameterButton(param, page, params)
                 Else
                     dlog.Warn("Processing: " & param.Name & " as string, type (" & param.VarType & ") not expected")
                     GetParameterString(param, page, params)
@@ -878,6 +880,13 @@ Public Class PSWebHelper
 
     Private Sub GetParameterStringSingle(param As PSCmdParam, page As Page, ByRef params As Dictionary(Of String, Object))
         Dim ctrl As TextBox = page.FindControl(param.FieldName)
+        If ctrl.Text <> "" Then 'only add the parameter if it is not empty
+            params.Add(param.Name, ctrl.Text)
+        End If
+    End Sub
+
+    Private Sub GetParameterButton(param As PSCmdParam, page As Page, ByRef params As Dictionary(Of String, Object))
+        Dim ctrl As Button = page.FindControl(param.FieldName)
         If ctrl.Text <> "" Then 'only add the parameter if it is not empty
             params.Add(param.Name, ctrl.Text)
         End If

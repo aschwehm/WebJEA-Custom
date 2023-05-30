@@ -178,7 +178,7 @@ Public Class PSScriptParser
                 dlog.Trace("ScriptParser: CommentBlockSection: Adding Description for VISIBLENAME: " & paramname)
                 prvParameterVisibleName.Add(paramname, comment)
             ElseIf (header.ToUpper.StartsWith("FORMGROUP")) Then
-                Dim paramname As String = header.ToUpper.Replace("FORMGROUP", "").Trim
+                Dim paramname As String = header.Replace("FORMGROUP", "").Trim
                 dlog.Trace("ScriptParser: CommentBlockSection: Adding Description for FORMGROUP: " & paramname)
                 prvParameterFormGroup.Add(paramname, comment)
             Else
@@ -256,25 +256,25 @@ Public Class PSScriptParser
                     If prvParameterVisibleName.ContainsKey(valstring.ToUpper) Then
                         psparam.VisibleName = prvParameterVisibleName(valstring.ToUpper)
                     End If
-                    If prvParameterFormGroup.ContainsKey(valstring.ToUpper) Then
-                        psparam.FormGroup = prvParameterFormGroup(valstring.ToUpper)
+                    If prvParameterFormGroup.ContainsKey(valstring) Then
+                        psparam.FormGroup = prvParameterFormGroup(valstring)
                         psparam.PostBackVisibleName = psparam.FormGroup
                         If prvParameterFormGroup.ContainsKey(psparam.FormGroup) Then
                             psparam.BackLinkFormGroup = prvParameterFormGroup.Item(psparam.FormGroup)
                         End If
                     End If
                     'Set AutoPostBack for WebControlField
-                    If prvParameterFormGroup.ContainsValue(valstring.ToUpper) Then
+                    If prvParameterFormGroup.ContainsValue(valstring) Then
                         psparam.AutoPostBack = True
                     End If
                     'Set VisibleName for Label Info
-                    If prvParameterFormGroup.ContainsKey(valstring.ToUpper) Then
-                        If prvParameterVisibleName.ContainsKey(prvParameterFormGroup.Item(valstring.ToUpper)) Then
-                            psparam.PostBackVisibleName = prvParameterVisibleName.Item(prvParameterFormGroup.Item(valstring.ToUpper))
+                    If prvParameterFormGroup.ContainsKey(valstring) Then
+                        If prvParameterVisibleName.ContainsKey(prvParameterFormGroup.Item(valstring)) Then
+                            psparam.PostBackVisibleName = prvParameterVisibleName.Item(prvParameterFormGroup.Item(valstring))
                         End If
                     End If
 
-                        IDX = closeIDX - 1 'subtract one because we didn't use the matched character and we want to evaluate it on the next step
+                    IDX = closeIDX - 1 'subtract one because we didn't use the matched character and we want to evaluate it on the next step
                 Case "=" 'default value
                     Dim closeIDX As Integer = AdvIndexOf(prvScript, New List(Of String)({",", ")", "#"}), IDX)
                     Dim valstring As String = prvScript.Substring(IDX + 1, closeIDX - IDX - 1)
