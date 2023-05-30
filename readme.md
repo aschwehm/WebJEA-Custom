@@ -17,9 +17,9 @@ Prefill Fields/Listboxes of the validate script on PageLoad (Fill Listbox with U
 * $FPITLSXXX
   * Creates a multiselect Listbox
 * $FPITBTXXX
-  * Creates a Button that can directly execute a Powershell script (testing)
-
-
+  * Creates a Button that can directly execute a Powershell script
+  * Script output is directly displayed below the Button in a temporary TextBox
+  * If you create a Group with another Control, you can use the Value of that control to execute the script with that Value
 
 Change the Display Name of a Field
 
@@ -29,6 +29,7 @@ Dynamic update of Dropdown Fields in Runtime
 
 Dynamicly filled Fields are now cached. As long as the selection of the parent field is not changed the Powershell Script is not triggered again
 
+Examples to the new Functions in the WIKI
 
 ## Goals
 
@@ -76,7 +77,7 @@ The DSC configuration included allows quick deployment and should be suitable in
 
 ## Limitations
 
-There are some limitations with WebJEA.  All of these are considered areas for future improvement so please give your feedback via [Issues](https://github.com/markdomansky/WebJEA/issues).
+There are some limitations with WebJEA.  All of these are considered areas for future improvement so please give your feedback via [Issues](https://github.com/FP-IT-Solutions-GmbH/WebJEA-Custom/issues).
 
 * Scripts run with limited feedback.  There is a "spinner", but nothing gets fed back to the client until the script is finished.
 * Write-Progress is ignored for the same reason.
@@ -87,11 +88,9 @@ There are some limitations with WebJEA.  All of these are considered areas for f
 
 ## Installation
 
-A DSC push configuration template is provided to get you going quickly.  Check the [Documentation](https://github.com/markdomansky/WebJEA/wiki) for more information.
-
 Installation Steps:
 1. Build a server, get a certificate, create a managed service account.
-2. Go to [Releases](https://github.com/markdomansky/WebJEA/releases), download and extract the latest release.
+2. Go to [Releases](https://github.com/FP-IT-Solutions-GmbH/WebJEA-Custom/releases), download and extract the latest release.
 3. Modify the DSCDeploy.ps1 with the machine name, certificate thumbprint, MSA username, and customize deployment folder, etc.
 4. execute DSCDeploy.ps1 configuration.  This will download and install the necessary DSC modules, the latest package, then start installation.
 5. Reboot should not be needed, but is recommended following first deployment.
