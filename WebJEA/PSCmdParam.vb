@@ -238,7 +238,7 @@ Public Class PSCmdParam
                     'script.ps1 <VariablenName> <Wert>  C:\temp\WebJEA\WebJea-Scripts\test.ps1
                     Dim FPIT_Path = WebJEA.My.Settings.configfile
                     FPIT_Path = FPIT_Path.Replace("config.json", "FPIT_Commands.ps1")
-                    Dim pscommand As String = FPIT_Path & " " & psparam.Name & " " & DefaultValue & "; exit $LASTEXITCODE"
+                    Dim pscommand As String = FPIT_Path & " " & psparam.Name & " '" & DefaultValue & "'" & "; Exit $LASTEXITCODE"
                     Dim cmd As String = "powershell.exe -noprofile -NonInteractive -WindowStyle hidden -command " & pscommand
                     Dim shell = CreateObject("WScript.Shell")
                     Dim executor = shell.Exec(cmd)
