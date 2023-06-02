@@ -79,7 +79,7 @@
                     <div class="card " id="panelInput" runat="server">
                         <div class="card-body">
                             <div id="divParameters" runat="server"></div>
-                            <asp:Button CssClass="btn btn-primary" ID="btnRun" runat="server" Text="Submit" OnClientClick="return disableOnPostback();" UseSubmitBehavior="True" /><span id="imgLoader"><span id="imgLoaderSVG" ></span></span>
+                            <asp:Button CssClass="btn btn-primary" ID="btnRun" runat="server" Text="Ausführen" OnClientClick="return disableOnPostback();" UseSubmitBehavior="True" /><span id="imgLoader"><span id="imgLoaderSVG" ></span></span>
                         </div>
 
                     </div>

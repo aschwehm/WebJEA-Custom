@@ -94,7 +94,7 @@ Public Class PSEngine
             Next
         End If
 
-        ps.Commands.AddCommand("out-string")
+        ps.Commands.AddCommand("out-string").AddParameter("Width", 1024)
 
         LogCommandExecuted()
         Dim timestart As DateTime = Now

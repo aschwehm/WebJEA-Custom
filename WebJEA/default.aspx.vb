@@ -272,7 +272,6 @@ Public Class _default
 
         consoleOutput.Text = psweb.ConvertToHTML(ps.getOutputData)
         ps = Nothing
-
     End Sub
 
 
