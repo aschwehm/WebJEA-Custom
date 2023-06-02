@@ -6,6 +6,9 @@ WebJEA allows you to dynamically build web forms for any PowerShell script.  Web
 
 _WebJEA does not require JEA endpoints but can work with them.  With WebJEA, any PS script you write can be exposed to a controlled set of users via a web interface._
 
+![image](https://github.com/FP-IT-Solutions-GmbH/WebJEA-Custom/assets/100138349/3f3efe0f-0186-45eb-a58a-bc5188a1f05e)
+
+
 ## Additional Changes in this Branch
 
 Prefill Fields/Listboxes of the validate script on PageLoad (Fill Listbox with Users...)
@@ -13,13 +16,17 @@ Prefill Fields/Listboxes of the validate script on PageLoad (Fill Listbox with U
 * $FPITLBXXX
   * Creates a Listbox that can be Pre-Filled
 * $FPITSLXXX
-  * Creates a single line Textbox that can be re-Filled
+  * Creates a single line Textbox that can be Pre-Filled
 * $FPITLSXXX
   * Creates a multiselect Listbox
 * $FPITBTXXX
   * Creates a Button that can directly execute a Powershell script
   * Script output is directly displayed below the Button in a temporary TextBox
-  * If you create a Group with another Control, you can use the Value of that control to execute the script with that Value
+  * If you create a Group with another Control, you can use the Value of that control to execute an additional script
+
+Create Grouped Controls
+ * One control depends on another
+ * Example: The selected Value of a Dropdown Box will be submitted to fill another Dropdown Box. (First Dropdown contains Users and the second Dropdown will be filled with the Groups the user is a member of.)
 
 Change the Display Name of a Field
 
