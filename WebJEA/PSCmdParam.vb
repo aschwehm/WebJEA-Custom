@@ -139,6 +139,11 @@ Public Class PSCmdParam
 
     End Sub
 
+    Public Function utf8_encode(ByVal indata As String) As String
+        Dim buffer() As Byte = Encoding.Default.GetBytes(indata)
+        Return Encoding.UTF8.GetString(buffer)
+    End Function
+
     Public Function Clone() As PSCmdParam
 
         Dim psparam As New PSCmdParam
@@ -246,16 +251,8 @@ Public Class PSCmdParam
 
                     Ausgabe = executor.StdOut.ReadAll
 
-                    'Filter Special Characters
-                    Ausgabe = Ausgabe.Replace("Ã¤", "ä")
-                    Ausgabe = Ausgabe.Replace("Ã¼", "ü")
-                    Ausgabe = Ausgabe.Replace("Ã¶", "ö")
+                    Ausgabe = utf8_encode(Ausgabe)
 
-                    Ausgabe = Ausgabe.Replace("Ã„", "Ä")
-                    Ausgabe = Ausgabe.Replace("Ãœ", "Ü")
-                    Ausgabe = Ausgabe.Replace("Ã–", "Ö")
-
-                    Ausgabe = Ausgabe.Replace("ÃŸ", "ß")
                 End If
             Else
                 Ausgabe = Nothing
