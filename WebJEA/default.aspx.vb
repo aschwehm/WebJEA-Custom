@@ -27,8 +27,8 @@ Public Class _default
         Else
             Dim CachedFormValuesSession As New Hashtable
             SessionValues.Add(Session.SessionID, CachedFormValuesSession)
+            SessionValues.Item(Session.SessionID).Add("WEBJEAUsername", uinfo.UserName)
         End If
-
         'Dim sessiontmp = (SessionValues.Item(Session.SessionID)).add("asd", "dsa")
 
         'CachedFormValues.Clear()

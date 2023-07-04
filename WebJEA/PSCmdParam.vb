@@ -218,7 +218,7 @@ Public Class PSCmdParam
 
             Dim Ausgabe As String = ""
 
-            If (FormGroup Is "" And DefaultValue Is Nothing) Or (FormGroup IsNot "" And DefaultValue IsNot Nothing) Then
+            If (FormGroup Is "" And DefaultValue Is Nothing) Or (FormGroup IsNot "" And DefaultValue IsNot Nothing) Or (DefaultValue Like "WEBJEAUsername") Then
 
                 If WebJEA._default.SessionValues.Item(SessionID).Contains("EXEC_" + Name) Then 'If its a Button and has a DefaultValue from a FormGroup Field then execute the additional Script
                     WebJEA._default.SessionValues.Item(SessionID).Remove("EXEC_" + Name)
@@ -237,6 +237,8 @@ Public Class PSCmdParam
                 Else 'If its not a button then normally execute the external Script to prefill Fields
                     If DefaultValue = "" Or DefaultValue = Nothing And Not (ParamType = ParameterType.PSButton) Then
                         DefaultValue = "0"
+                    ElseIf DefaultValue = "WEBJEAUsername" Then
+                        DefaultValue = WebJEA._default.SessionValues.Item(SessionID).Item("WEBJEAUsername")
                     End If
 
                     'Aufruf externes Powershell Script
