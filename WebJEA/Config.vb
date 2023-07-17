@@ -17,7 +17,6 @@
         'future if different, reload
 
         'read My.Settings.configfile
-
     End Sub
 
     Public Sub InitGroups(grpfinder As GroupFinder)
