@@ -21,7 +21,6 @@ Public Class _default
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         dlog.Trace("Page: Start")
-
         If SessionValues.ContainsKey(Session.SessionID) Then
             '''''
         Else
@@ -85,9 +84,18 @@ Public Class _default
                     End If
                     If Not keyvalue Is Nothing Then 'Falls das Feld leer war dann speichert er auch nichts ab
                         If SessionValues.Item(Session.SessionID).ContainsKey(key) Then 'Falls es den Key bereits in der Hashtable gibt dann....
-                            If Not SessionValues.Item(Session.SessionID).Item(key) = keyvalue Then '...Prüfe ob sich der Wert geändert hat...
-                                SessionValues.Item(Session.SessionID).Item(key) = keyvalue '... Wenn er sich geändert hat dann mache ein Update vom Wert und....
-                                SessionValues.Item(Session.SessionID).Add("UPDATE_" + key, "") '... erstelle einen zusätzlichen Key damit erkennbar ist das sich was geändert hat.
+
+                            If keyvalue.GetType() Is GetType(System.Collections.Generic.List(Of String)) Then
+
+                                If CompareKeys(SessionValues.Item(Session.SessionID).Item(key), keyvalue) Then
+                                    SessionValues.Item(Session.SessionID).Item(key) = keyvalue
+                                    SessionValues.Item(Session.SessionID).Add("UPDATE_" + key, "")
+                                End If
+                            Else
+                                If Not SessionValues.Item(Session.SessionID).Item(key) = keyvalue Then '...Prüfe ob sich der Wert geändert hat...
+                                    SessionValues.Item(Session.SessionID).Item(key) = keyvalue '... Wenn er sich geändert hat dann mache ein Update vom Wert und....
+                                    SessionValues.Item(Session.SessionID).Add("UPDATE_" + key, "") '... erstelle einen zusätzlichen Key damit erkennbar ist das sich was geändert hat.
+                                End If
                             End If
                         Else
                             SessionValues.Item(Session.SessionID).Add(key, keyvalue) 'Falls es keinen Key gibt dann erstelle einen
@@ -161,7 +169,7 @@ Public Class _default
 
         'add version to display
         Try
-            lblVersion.Text = " v" + System.Reflection.Assembly.GetExecutingAssembly.GetName().Version.ToString(4)
+            lblVersion.Text = " v" + System.Reflection.Assembly.GetExecutingAssembly.GetName().Version.ToString(4) + ".5"
             objTelemetry.Add("appedition", "CE")
             objTelemetry.Add("appversion", System.Reflection.Assembly.GetExecutingAssembly.GetName().Version.ToString(4))
         Catch ex As Exception
@@ -183,6 +191,7 @@ Public Class _default
 
             'build display
             lblCmdTitle.Text = cmd.DisplayName
+            lblcmdUsername.Text = uinfo.UserName
             If cmd.Synopsis <> "" Then
                 lblCmdSynopsis.Text = cmd.Synopsis
                 lblCmdDescription.Text = cmd.Description
@@ -233,7 +242,25 @@ Public Class _default
 
     End Sub
 
+    Public Function CompareKeys(List1 As List(Of String), List2 As List(Of String)) As Boolean
+        Dim hs1 = New HashSet(Of String)(List1)
+        Dim hs2 = New HashSet(Of String)(List2)
 
+        If Not (hs1.Count = hs2.Count) Then
+            Return False
+        End If
+
+        For Each value In hs2
+            Dim isKeyEqual As Boolean = False
+            isKeyEqual = hs1.Contains(value)
+
+            If Not isKeyEqual Then
+                Return False
+            End If
+        Next
+
+        Return True
+    End Function
 
     Protected Sub btnRun_Click(sender As Object, e As EventArgs) Handles btnRun.Click
 

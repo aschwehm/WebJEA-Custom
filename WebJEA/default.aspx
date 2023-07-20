@@ -50,9 +50,9 @@
                                         <li class="menulink <%#Eval("CSS") %>"><a href="<%#Eval("Uri") %>"><%#Eval("DisplayName") %></a></li>
                                     </ItemTemplate>
                                 </asp:ListView>
-                                <div id="footer" class="footer">Powered by <a href="http://webjea.com" target="_blank">WebJEA</a> and <a href="http://www.fpitsolutions.de" target="_blank">FP-IT Solutions GmbH</a><asp:Literal runat="server" ID="lblVersion"></asp:Literal>.</div>
-                            </div>
-                        </div>
+                                <div id="footer" class="footer">Current User: <asp:Label ID="lblcmdUsername" runat="server" Text="lblcmdUsername" CssClass="WebJEAUser"></asp:Label><br />Powered by <a href="http://webjea.com" target="_blank">WebJEA</a> and <a href="http://www.fpitsolutions.de" target="_blank">FP-IT Solutions GmbH</a><asp:Literal runat="server" ID="lblVersion"></asp:Literal>.</div>
+                            </div>              
+                        </div>    
                     </div>
                 </div>
 
@@ -60,7 +60,7 @@
                 <div class="col-md-9 main" runat="server" id="divCmdBody" clientmode="static">
                     <div class="page-header">
                         <h3>
-                            <asp:Label ID="lblCmdTitle" runat="server" Text="lblCmdTitle"></asp:Label>
+                            <asp:Label ID="lblCmdTitle" runat="server" Text="lblCmdTitle"></asp:Label> 
                         </h3>
                     </div>
                     <div id="Synopsis" class="description">

@@ -41,6 +41,15 @@ Partial Public Class _default
     Protected WithEvents lvMenu As Global.System.Web.UI.WebControls.ListView
 
     '''<summary>
+    '''lblcmdUsername-Steuerelement.
+    '''</summary>
+    '''<remarks>
+    '''Automatisch generiertes Feld.
+    '''Zum Ändern Felddeklaration aus der Designerdatei in eine Code-Behind-Datei verschieben.
+    '''</remarks>
+    Protected WithEvents lblcmdUsername As Global.System.Web.UI.WebControls.Label
+
+    '''<summary>
     '''lblVersion-Steuerelement.
     '''</summary>
     '''<remarks>
