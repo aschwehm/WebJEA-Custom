@@ -10,7 +10,7 @@ Public Class _default
     Private uinfo As New UserInfo(Page.User)
     Private objTelemetry As New Telemetry
     Public grpfinder As New GroupFinder
-    Public cfg As WebJEA.Config
+    Public Shared cfg As WebJEA.Config
     ' Public Shared CachedFormValues As New Hashtable()
     Public Shared SessionValues As New Hashtable()
     'advanced functions should be able to retrieve the get-help and parameter data, then permit overriding

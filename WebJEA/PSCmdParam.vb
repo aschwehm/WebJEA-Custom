@@ -223,16 +223,14 @@ Public Class PSCmdParam
                 If WebJEA._default.SessionValues.Item(SessionID).Contains("EXEC_" + Name) Then 'If its a Button and has a DefaultValue from a FormGroup Field then execute the additional Script
                     WebJEA._default.SessionValues.Item(SessionID).Remove("EXEC_" + Name)
 
-                    Dim FPIT_Path = WebJEA.My.Settings.configfile
-                    FPIT_Path = FPIT_Path.Replace("config.json", Name + ".ps1")
-                    Dim pscommand As String = FPIT_Path & " '" & DefaultValue & "'" & "; exit $LASTEXITCODE"
+                    Dim dynamic_commands_file = WebJEA._default.cfg.BasePath + "\" + WebJEA._default.cfg.dynamic_commands
+                    Dim pscommand As String = dynamic_commands_file & " '" & DefaultValue & "'" & "; exit $LASTEXITCODE"
                     Dim cmd As String = "powershell.exe -noprofile -NonInteractive -WindowStyle hidden -command " & pscommand
                     Dim shell = CreateObject("WScript.Shell")
                     Dim executor = shell.Exec(cmd)
                     executor.StdIn.Close
 
                     psparam.DefaultValue_BT = executor.StdOut.ReadAll
-
 
                 Else 'If its not a button then normally execute the external Script to prefill Fields
                     If DefaultValue = "" Or DefaultValue = Nothing And Not (ParamType = ParameterType.PSButton) Then
@@ -243,9 +241,8 @@ Public Class PSCmdParam
 
                     'Aufruf externes Powershell Script
                     'script.ps1 <VariablenName> <Wert>  C:\temp\WebJEA\WebJea-Scripts\test.ps1
-                    Dim FPIT_Path = WebJEA.My.Settings.configfile
-                    FPIT_Path = FPIT_Path.Replace("config.json", "FPIT_Commands.ps1")
-                    Dim pscommand As String = FPIT_Path & " " & psparam.Name & " '" & DefaultValue & "'" & "; Exit $LASTEXITCODE"
+                    Dim dynamic_commands_file = WebJEA._default.cfg.BasePath + "\" + WebJEA._default.cfg.dynamic_commands
+                    Dim pscommand As String = dynamic_commands_file & " " & psparam.Name & " '" & DefaultValue & "'" & "; Exit $LASTEXITCODE"
                     Dim cmd As String = "powershell.exe -noprofile -NonInteractive -WindowStyle hidden -command " & pscommand
                     Dim shell = CreateObject("WScript.Shell")
                     Dim executor = shell.Exec(cmd)

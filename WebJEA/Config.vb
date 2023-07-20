@@ -7,6 +7,7 @@
     Public ParseScript As TriState = TriState.True
     Private prvDefaultCommandId As String
     Public BasePath As String
+    Public dynamic_commands As String = "FPIT_Commands.ps1"
     Public SendTelemetry As Boolean = False
     Public PermittedGroups As New List(Of String)()
     Private prvGroupSIDs As New List(Of String)
