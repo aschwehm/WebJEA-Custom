@@ -2,6 +2,7 @@
     "Title": "WebJEA Demo",
     "defaultcommandid": "overview",
     "basepath": "c:\\scripts",
+    "dynamic_commands":	"FPIT_Commands.ps1",
     "LogParameters": true,
     "permittedgroups": [".\\Administrators"],
     "commands": [{
